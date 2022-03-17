@@ -1,0 +1,51 @@
+version: "3.3"
+
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:${CONF_VER}
+    hostname: zookeeper
+    container_name: zookeeper
+    ports:
+      - 2181:2181
+    environment:
+      TZ: ${TZ_SET}
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - confluent
+
+  kafka:
+    image: confluentinc/cp-enterprise-kafka:${CONF_VER}
+    hostname: kafka
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - 9092:9092
+    environment:
+      TZ: ${TZ_SET}
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - confluent
+
+  kafka-mqtt:
+    image: confluentinc/cp-kafka-mqtt:${CONF_VER}
+    depends_on:
+      - kafka
+    ports:
+      - 1883:1883
+    environment:
+      KAFKA_MQTT_BOOTSTRAP_SERVERS: kafka:29092
+      KAFKA_MQTT_CONFLUENT_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_MQTT_TOPIC_REGEX_LIST: temperature:.*
+    networks:
+      - confluent
+
+networks:
+  confluent:
+    name: confluent
