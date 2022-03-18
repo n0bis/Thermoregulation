@@ -35,6 +35,8 @@ services:
 
   kafka-mqtt:
     image: confluentinc/cp-kafka-mqtt:${CONF_VER}
+    hostname: mqtt
+    container_name: mqtt
     depends_on:
       - kafka
     ports:
@@ -45,6 +47,27 @@ services:
       KAFKA_MQTT_TOPIC_REGEX_LIST: temperature:.*
     networks:
       - confluent
+
+  neo4j:
+    image: neo4j:${NEO4J_VER}
+    hostname: neo4j
+    container_name: neo4j
+    ports:
+      - 7475:7474
+      - 7688:7687
+    depends_on:
+      - kafka
+    volumes:
+      - ./plugins:/plugins
+    networks:
+      - confluent
+    environment:
+      TZ: ${TZ_SET}
+      NEO4J_AUTH: ${NEO4J_AUTH}
+      NEO4J_dbms_logs_debug_level: DEBUG
+      NEO4J_kafka_zookeeper_connect: zookeeper:2181
+      NEO4J_kafka_bootstrap_servers: kafka:29092
+      NEO4J_streams_sink_topic_cypher_neo4j:  "CREATE (p:Person{firstName: event.data.name, lastName: event.data.surname})"
 
 networks:
   confluent:
