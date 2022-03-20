@@ -6,10 +6,10 @@ services:
     hostname: zookeeper
     container_name: zookeeper
     ports:
-      - 12181:12181
+      - 2181:2181
     environment:
       TZ: ${TZ_SET}
-      ZOOKEEPER_CLIENT_PORT: 12181
+      ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
 
   kafka:
@@ -19,12 +19,13 @@ services:
     depends_on:
       - zookeeper
     ports:
-      - 19092:19092
+      - 9092:9092
     environment:
       TZ: ${TZ_SET}
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:19092
+      KAFKA_ADVERTISED_HOST_NAME: kafka
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:12181
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
   kafka-mqtt:
@@ -36,7 +37,7 @@ services:
     ports:
       - 1883:1883
     environment:
-      KAFKA_MQTT_BOOTSTRAP_SERVERS: PLAINTEXT://kafka:19092
+      KAFKA_MQTT_BOOTSTRAP_SERVERS: PLAINTEXT://kafka:9092
       KAFKA_MQTT_CONFLUENT_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_MQTT_TOPIC_REGEX_LIST: temperature:.*
 
@@ -55,8 +56,8 @@ services:
       TZ: ${TZ_SET}
       NEO4J_AUTH: ${NEO4J_AUTH}
       NEO4J_dbms_logs_debug_level: DEBUG
-      NEO4J_kafka_zookeeper_connect: zookeeper:12181
-      NEO4J_kafka_bootstrap_servers: kafka:19092
+      NEO4J_kafka_zookeeper_connect: zookeeper:2181
+      NEO4J_kafka_bootstrap_servers: kafka:9092
       NEO4J_kafka_auto_offset_reset: earliest 
       #NEO4J_kafka_group_id: neo4j
       NEO4J_streams_sink_topic_cypher_temperature:  "CREATE (p:Person{name: event.name, title: event.title})"
@@ -71,7 +72,7 @@ services:
     hostname: kowl
     container_name: kowl
     environment:
-      KAFKA_BROKERS: kafka:19092
+      KAFKA_BROKERS: kafka:9092
     restart: always
     depends_on:
       - kafka
