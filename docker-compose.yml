@@ -6,32 +6,26 @@ services:
     hostname: zookeeper
     container_name: zookeeper
     ports:
-      - 2181:2181
+      - 12181:12181
     environment:
       TZ: ${TZ_SET}
-      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_CLIENT_PORT: 12181
       ZOOKEEPER_TICK_TIME: 2000
-    networks:
-      - confluent
 
   kafka:
-    image: confluentinc/cp-enterprise-kafka:${CONF_VER}
+    image: confluentinc/cp-kafka:${CONF_VER}
     hostname: kafka
     container_name: kafka
     depends_on:
       - zookeeper
     ports:
-      - 9092:9092
+      - 19092:19092
     environment:
       TZ: ${TZ_SET}
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:19092
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:12181
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-    networks:
-      - confluent
 
   kafka-mqtt:
     image: confluentinc/cp-kafka-mqtt:${CONF_VER}
@@ -42,33 +36,42 @@ services:
     ports:
       - 1883:1883
     environment:
-      KAFKA_MQTT_BOOTSTRAP_SERVERS: kafka:29092
+      KAFKA_MQTT_BOOTSTRAP_SERVERS: PLAINTEXT://kafka:19092
       KAFKA_MQTT_CONFLUENT_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_MQTT_TOPIC_REGEX_LIST: temperature:.*
-    networks:
-      - confluent
 
   neo4j:
     image: neo4j:${NEO4J_VER}
     hostname: neo4j
     container_name: neo4j
     ports:
-      - 7475:7474
-      - 7688:7687
+      - 7474:7474
+      - 7687:7687
     depends_on:
       - kafka
     volumes:
       - ./plugins:/plugins
-    networks:
-      - confluent
     environment:
       TZ: ${TZ_SET}
       NEO4J_AUTH: ${NEO4J_AUTH}
       NEO4J_dbms_logs_debug_level: DEBUG
-      NEO4J_kafka_zookeeper_connect: zookeeper:2181
-      NEO4J_kafka_bootstrap_servers: kafka:29092
-      NEO4J_streams_sink_topic_cypher_neo4j:  "CREATE (p:Person{firstName: event.data.name, lastName: event.data.surname})"
+      NEO4J_kafka_zookeeper_connect: zookeeper:12181
+      NEO4J_kafka_bootstrap_servers: kafka:19092
+      NEO4J_kafka_auto_offset_reset: earliest 
+      #NEO4J_kafka_group_id: neo4j
+      NEO4J_streams_sink_topic_cypher_temperature:  "CREATE (p:Person{name: event.name, title: event.title})"
+      NEO4J_streams_sink_polling_interval: 1000  
+      NEO4J_streams_sink_enable: "true" 
+      NEO4J_streams_procedures_enable: "true"
 
-networks:
-  confluent:
-    name: confluent
+  kowl:
+    image: quay.io/cloudhut/kowl:master
+    ports:
+      - 8088:8080
+    hostname: kowl
+    container_name: kowl
+    environment:
+      KAFKA_BROKERS: kafka:19092
+    restart: always
+    depends_on:
+      - kafka
