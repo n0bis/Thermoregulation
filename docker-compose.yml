@@ -39,9 +39,9 @@ services:
     ports:
       - 1883:1883
     environment:
-      KAFKA_MQTT_BOOTSTRAP_SERVERS: PLAINTEXT://kafka:29092
+      KAFKA_MQTT_BOOTSTRAP_SERVERS: kafka:29092
       KAFKA_MQTT_CONFLUENT_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_MQTT_TOPIC_REGEX_LIST: temperature:.*
+      KAFKA_MQTT_TOPIC_REGEX_LIST: sales:.*
 
   neo4j:
     image: neo4j:${NEO4J_VER}
@@ -53,19 +53,37 @@ services:
     depends_on:
       - kafka
     volumes:
-      - ./plugins:/plugins
+      - ./neo4j/plugins:/plugins
+      - ./neo4j/seed:/cyphers
     environment:
       TZ: ${TZ_SET}
       NEO4J_AUTH: ${NEO4J_AUTH}
       NEO4J_dbms_logs_debug_level: DEBUG
       NEO4J_kafka_zookeeper_connect: zookeeper:2181
       NEO4J_kafka_bootstrap_servers: kafka:29092
-      NEO4J_kafka_auto_offset_reset: earliest 
+      #NEO4J_kafka_auto_offset_reset: earliest 
       #NEO4J_kafka_group_id: neo4j
-      NEO4J_streams_sink_topic_cypher_temperature:  "CREATE (p:Person{name: event.name, title: event.title})"
       NEO4J_streams_sink_polling_interval: 1000  
-      NEO4J_streams_sink_enable: "true" 
-      NEO4J_streams_procedures_enable: "true"
+      NEO4J_kafka_key_deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
+      NEO4J_kafka_value_deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
+      NEO4J_streams_source_enabled: "true"
+      NEO4J_streams_sink_enabled: "true"
+      NEO4J_streams_source_topic_nodes_customer: Customer{customerID,contactName,companyName}
+      NEO4J_streams_source_topic_nodes_order: Order{orderID,shipCity,shipAddress}
+      NEO4J_streams_source_topic_nodes_product: Product{productID,productName}
+      NEO4J_streams_source_topic_relationships_purchased: PURCHASED{*}
+      NEO4J_streams_source_topic_relationships_orders: ORDERS{quantity,unitPrice}
+      NEO4J_streams_sink_topic_cypher_sales: "
+        MERGE (c:Customer {customerID: event.customer.customerID})
+            ON CREATE SET c.contactName = event.customer.contactName,
+                          c.companyName = event.customer.companyName
+        MERGE (o:Order {orderID: event.order.orderID})
+            ON CREATE SET o.shipCity = event.order.shipCity,
+                          o.shipAddress = event.order.shipAddress,
+                          o.orderDate = localdatetime()
+        MERGE (p:Product {productID: event.product.productID})
+            ON CREATE SET p.productName = event.product.productName
+        MERGE (c)-[:PURCHASED]->(o)-[os:ORDERS {quantity: event.product.quantity, unitPrice: event.product.unitPrice}]->(p)"
 
   kowl:
     image: quay.io/cloudhut/kowl:master
