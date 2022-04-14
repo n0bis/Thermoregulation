@@ -1,9 +1,8 @@
 # Thermoregulation
  
-Have to seed manually: ```/neo4j/seeddata_seed.cql ```
-http://localhost:7474/browser/
+neo4j will now automatically populate the db
 
-test to populate new data: 
-```mosquitto_pub -t 'test/topic' -h localhost -p 1883 -f northwind-events.txt```
+test to populate new data (navigate to iot-device folder): 
+```mosquitto_pub -t 'test/topic' -h localhost -p 1883 -f temperature-events.txt```
 
-neo4j browser: ```MATCH path=(customer:Customer)-[:PURCHASED]->(order:Order)-[:ORDERS]->(product:Product) WHERE customer.customerID = 'DOE' RETURN path```
+waatch in neo4j browser
