@@ -1,0 +1,1 @@
+{"temperatureID": "sensor-iot-temp", "value": 6.5, "truckID": 1}

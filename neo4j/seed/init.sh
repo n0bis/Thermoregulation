@@ -9,7 +9,7 @@ set -m
 
 /docker-entrypoint.sh neo4j &
 
-sleep 60
+sleep 120
 
 log_info "Waiting until neo4j stats at :7474 ..."
 wget -b --quiet --tries=10 --waitretry=30 -O /dev/null bolt://localhost:7474
