@@ -1,0 +1,7 @@
+productID, productName, categoryID, companyID
+1, Apple, 1, 1
+2, Milk, 2, 1
+3, Peas, 3, 1
+4, Yogurt, 2, 2
+5, Pear, 1, 2
+6, Spring Rolls, 3, 2
