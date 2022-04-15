@@ -1,0 +1,29 @@
+Manifest-Version: 1.0
+Automatic-Module-Name: org.healthydrone.dsl.expressions
+Bundle-ManifestVersion: 2
+Bundle-Name: org.healthydrone.dsl.expressions
+Bundle-Vendor: My Company
+Bundle-Version: 1.0.0.qualifier
+Bundle-SymbolicName: org.healthydrone.dsl.expressions; singleton:=true
+Bundle-ActivationPolicy: lazy
+Require-Bundle: org.eclipse.xtext,
+ org.eclipse.xtext.xbase,
+ org.eclipse.equinox.common;bundle-version="3.5.0",
+ org.eclipse.emf.ecore,
+ org.eclipse.xtext.xbase.lib;bundle-version="2.14.0",
+ org.eclipse.xtext.util,
+ org.eclipse.emf.common,
+ org.antlr.runtime;bundle-version="[3.2.0,3.2.1)"
+Bundle-RequiredExecutionEnvironment: JavaSE-11
+Export-Package: org.healthydrone.dsl.expressions.parser.antlr,
+ org.healthydrone.dsl.expressions.parser.antlr.internal,
+ org.healthydrone.dsl.expressions.scoping,
+ org.healthydrone.dsl.expressions.serializer,
+ org.healthydrone.dsl.expressions,
+ org.healthydrone.dsl.expressions.expressions,
+ org.healthydrone.dsl.expressions.expressions.impl,
+ org.healthydrone.dsl.expressions.generator,
+ org.healthydrone.dsl.expressions.expressions.util,
+ org.healthydrone.dsl.expressions.services,
+ org.healthydrone.dsl.expressions.validation
+Import-Package: org.apache.log4j
