@@ -7,27 +7,35 @@ chan PUBLISH1, PUSBACK1, PUBREC1, PUBREL1, PUBCOMP1;
 chan PUBLISH, PUBACK, PUBREC, PUBREL, PUBCOMP;
 
 chan temp_sensor1, temp_sensor2;
-
+chan UNSUBACK, UNSUBSCRIBE;
+chan CONNECT, CONNACK;
 clock y;
-int[0,1] active;
-clock x1, G, T, desc;
+int active = 1;
+int G = 1;
+clock x1, T, desc;
 </declaration>
 	<template>
-		<name>WorkerController</name>
+		<name>Broker</name>
 		<location id="id0" x="0" y="0">
-			<name x="-51" y="8">WorkerController</name>
 		</location>
 		<init ref="id0"/>
+	</template>
+	<template>
+		<name>WorkerController</name>
+		<location id="id1" x="0" y="0">
+			<name x="-51" y="8">WorkerController</name>
+		</location>
+		<init ref="id1"/>
 		<transition>
-			<source ref="id0"/>
-			<target ref="id0"/>
+			<source ref="id1"/>
+			<target ref="id1"/>
 			<label kind="synchronisation" x="-92" y="-80">temp_sensor2!</label>
 			<nail x="-110" y="-127"/>
 			<nail x="-110" y="-17"/>
 		</transition>
 		<transition>
-			<source ref="id0"/>
-			<target ref="id0"/>
+			<source ref="id1"/>
+			<target ref="id1"/>
 			<label kind="synchronisation" x="18" y="-42">temp_sensor1!</label>
 			<nail x="68" y="-51"/>
 			<nail x="76" y="93"/>
@@ -35,33 +43,26 @@ clock x1, G, T, desc;
 	</template>
 	<template>
 		<name>GatewayController</name>
-		<location id="id1" x="-467" y="-8">
+		<location id="id2" x="-467" y="-8">
 			<name x="-603" y="-34">GatewayController</name>
 		</location>
-		<location id="id2" x="-272" y="8">
+		<location id="id3" x="-272" y="8">
 		</location>
-		<location id="id3" x="17" y="8">
-		</location>
-		<init ref="id1"/>
+		<init ref="id2"/>
 		<transition>
-			<source ref="id1"/>
-			<target ref="id2"/>
+			<source ref="id2"/>
+			<target ref="id3"/>
 			<label kind="synchronisation" x="-449" y="-17">temp_sensor2?</label>
 		</transition>
 		<transition>
 			<source ref="id3"/>
-			<target ref="id1"/>
-			<nail x="17" y="102"/>
-			<nail x="-476" y="119"/>
+			<target ref="id2"/>
+			<label kind="synchronisation" x="-254" y="-9">PUBLISH!</label>
+			<nail x="-425" y="136"/>
 		</transition>
 		<transition>
 			<source ref="id2"/>
 			<target ref="id3"/>
-			<label kind="synchronisation" x="-254" y="-9">PUBCOMP!</label>
-		</transition>
-		<transition>
-			<source ref="id1"/>
-			<target ref="id2"/>
 			<label kind="synchronisation" x="-476" y="-93">temp_sensor1?</label>
 			<nail x="-357" y="-76"/>
 		</transition>
@@ -256,14 +257,56 @@ clock x1, G, T, desc;
 			<nail x="-119" y="59"/>
 		</transition>
 	</template>
+	<template>
+		<name>MQTTunsub</name>
+		<location id="id21" x="0" y="0">
+		</location>
+		<location id="id22" x="-127" y="0">
+		</location>
+		<init ref="id21"/>
+		<transition>
+			<source ref="id22"/>
+			<target ref="id21"/>
+			<label kind="synchronisation" x="-75" y="17">UNSUBACK!</label>
+			<nail x="-93" y="68"/>
+		</transition>
+		<transition>
+			<source ref="id21"/>
+			<target ref="id22"/>
+			<label kind="synchronisation" x="-109" y="-17">UNSUBSCRIBE?</label>
+		</transition>
+	</template>
+	<template>
+		<name>MQTTConnect</name>
+		<location id="id23" x="0" y="0">
+		</location>
+		<location id="id24" x="136" y="0">
+		</location>
+		<init ref="id23"/>
+		<transition>
+			<source ref="id24"/>
+			<target ref="id23"/>
+			<label kind="synchronisation" x="18" y="-59">CONNACK!</label>
+			<nail x="136" y="-17"/>
+			<nail x="76" y="-85"/>
+		</transition>
+		<transition>
+			<source ref="id23"/>
+			<target ref="id24"/>
+			<label kind="synchronisation" x="18" y="-17">CONNECT!</label>
+		</transition>
+	</template>
 	<system>// Place template instantiations here.
 MQTTpublish = MQTTpublisher();
 MQTTsubscribe = MQTTsubscriber();
+Sub = MQTTsub();
+Unsub = MQTTunsub();
+Con = MQTTConnect();
 
 Worker = WorkerController();
 Gateway = GatewayController();
 // List one or more processes to be composed into a system.
-system Worker, Gateway, MQTTpublish, MQTTsubscribe;
+system MQTTpublish, MQTTsubscribe, Sub, Unsub, Con;
     </system>
 	<queries>
 		<query>
