@@ -6,60 +6,64 @@ chan PINGREQ, PINGRESP, DISCONN, pub_broc;
 chan PUBLISH1, PUSBACK1, PUBREC1, PUBREL1, PUBCOMP1;
 chan PUBLISH, PUBACK, PUBREC, PUBREL, PUBCOMP;
 
-chan press;
+chan temp_sensor1, temp_sensor2;
+
 clock y;
 int[0,1] active;
 clock x1, G, T, desc;
 </declaration>
 	<template>
-		<name>Sensor</name>
-		<location id="id0" x="-467" y="-8">
-			<name x="-477" y="-42">off</name>
-		</location>
-		<location id="id1" x="-272" y="8">
-		</location>
-		<location id="id2" x="17" y="8">
+		<name>WorkerController</name>
+		<location id="id0" x="0" y="0">
+			<name x="-51" y="8">WorkerController</name>
 		</location>
 		<init ref="id0"/>
 		<transition>
-			<source ref="id2"/>
+			<source ref="id0"/>
 			<target ref="id0"/>
-			<label kind="synchronisation" x="-458" y="93">press?</label>
+			<label kind="synchronisation" x="-92" y="-80">temp_sensor2!</label>
+			<nail x="-110" y="-127"/>
+			<nail x="-110" y="-17"/>
+		</transition>
+		<transition>
+			<source ref="id0"/>
+			<target ref="id0"/>
+			<label kind="synchronisation" x="18" y="-42">temp_sensor1!</label>
+			<nail x="68" y="-51"/>
+			<nail x="76" y="93"/>
+		</transition>
+	</template>
+	<template>
+		<name>GatewayController</name>
+		<location id="id1" x="-467" y="-8">
+			<name x="-603" y="-34">GatewayController</name>
+		</location>
+		<location id="id2" x="-272" y="8">
+		</location>
+		<location id="id3" x="17" y="8">
+		</location>
+		<init ref="id1"/>
+		<transition>
+			<source ref="id1"/>
+			<target ref="id2"/>
+			<label kind="synchronisation" x="-449" y="-17">temp_sensor2?</label>
+		</transition>
+		<transition>
+			<source ref="id3"/>
+			<target ref="id1"/>
 			<nail x="17" y="102"/>
 			<nail x="-476" y="119"/>
 		</transition>
 		<transition>
+			<source ref="id2"/>
+			<target ref="id3"/>
+			<label kind="synchronisation" x="-254" y="-9">PUBCOMP!</label>
+		</transition>
+		<transition>
 			<source ref="id1"/>
 			<target ref="id2"/>
-			<label kind="guard" x="-254" y="-26">y&lt;5</label>
-			<label kind="synchronisation" x="-254" y="-9">press?</label>
-		</transition>
-		<transition>
-			<source ref="id1"/>
-			<target ref="id0"/>
-			<label kind="guard" x="-356" y="12">y&gt;=5</label>
-			<label kind="synchronisation" x="-356" y="29">press?</label>
-			<nail x="-374" y="85"/>
-		</transition>
-		<transition>
-			<source ref="id0"/>
-			<target ref="id1"/>
-			<label kind="synchronisation" x="-449" y="-59">press?</label>
-			<label kind="assignment" x="-449" y="-42">y:=0</label>
+			<label kind="synchronisation" x="-476" y="-93">temp_sensor1?</label>
 			<nail x="-357" y="-76"/>
-		</transition>
-	</template>
-	<template>
-		<name>Template0</name>
-		<location id="id3" x="0" y="0">
-		</location>
-		<init ref="id3"/>
-		<transition>
-			<source ref="id3"/>
-			<target ref="id3"/>
-			<label kind="synchronisation" x="18" y="-42">press!</label>
-			<nail x="68" y="-51"/>
-			<nail x="76" y="93"/>
 		</transition>
 	</template>
 	<template>
@@ -101,17 +105,17 @@ clock x1, G, T, desc;
 		<transition>
 			<source ref="id8"/>
 			<target ref="id9"/>
-			<label kind="synchronisation" x="171" y="-25">PUBREC!</label>
+			<label kind="synchronisation" x="178" y="8">PUBREC!</label>
 		</transition>
 		<transition>
 			<source ref="id7"/>
 			<target ref="id8"/>
-			<label kind="synchronisation" x="103" y="-25">PUBACK!</label>
+			<label kind="synchronisation" x="93" y="8">PUBACK!</label>
 		</transition>
 		<transition>
 			<source ref="id6"/>
 			<target ref="id7"/>
-			<label kind="synchronisation" x="18" y="-25">pub_broc!</label>
+			<label kind="synchronisation" x="0" y="8">pub_broc!</label>
 		</transition>
 		<transition>
 			<source ref="id4"/>
@@ -206,17 +210,17 @@ clock x1, G, T, desc;
 		<transition>
 			<source ref="id15"/>
 			<target ref="id16"/>
-			<label kind="synchronisation" x="-158" y="-47">PUBREC1!</label>
+			<label kind="synchronisation" x="-144" y="-25">PUBREC1!</label>
 		</transition>
 		<transition>
 			<source ref="id14"/>
 			<target ref="id15"/>
-			<label kind="synchronisation" x="-217" y="-47">PUSBACK1!</label>
+			<label kind="synchronisation" x="-246" y="-17">PUSBACK1!</label>
 		</transition>
 		<transition>
 			<source ref="id13"/>
 			<target ref="id14"/>
-			<label kind="synchronisation" x="-297" y="-76">PUBLISH1!</label>
+			<label kind="synchronisation" x="-314" y="-76">PUBLISH1!</label>
 		</transition>
 		<transition>
 			<source ref="id12"/>
@@ -253,14 +257,13 @@ clock x1, G, T, desc;
 		</transition>
 	</template>
 	<system>// Place template instantiations here.
-pub = MQTTpublisher();
-sub = MQTTsubscriber();
-s = MQTTsub();
+MQTTpublish = MQTTpublisher();
+MQTTsubscribe = MQTTsubscriber();
 
-sen = Sensor();
-t = Template0();
+Worker = WorkerController();
+Gateway = GatewayController();
 // List one or more processes to be composed into a system.
-system sen, t;
+system Worker, Gateway, MQTTpublish, MQTTsubscribe;
     </system>
 	<queries>
 		<query>
