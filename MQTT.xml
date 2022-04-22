@@ -1,26 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.1//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_2.dtd'>
 <nta>
-	<declaration>chan SUBSCRIBE, SUBACK;
-chan PINGREQ, PINGRESP, DISCONN, pub_broc;
-chan PUBLISH1,PUBACK1, PUBREC1, PUBREL1, PUBCOMP1;
-chan PUBLISH, PUBACK, PUBREC, PUBREL, PUBCOMP;
+	<declaration>//MQTTsub
+chan SUBSCRIBE, SUBACK;
 
-chan temp_sensor1, temp_sensor2;
+//MQTTunsub
 chan UNSUBACK, UNSUBSCRIBE;
+
+//MQTTconnect
 chan CONNECT, CONNACK;
 
+//MQTTpublisher/MQTTsubscriber
+chan PINGREQ, PINGRESP, DISCONN, pub_broc;
+
+//MQTTsubscriber
+chan PUBLISH1,PUBACK1, PUBREC1, PUBREL1, PUBCOMP1;
+int active = 1;
+int G = 1;
+
+//MQTTpublisher
+chan PUBLISH, PUBACK, PUBREC, PUBREL, PUBCOMP;
+clock x1, T, desc;
+
+//Workercontroler/gatewayController
+chan temp_sensor1, temp_sensor2;
+
+//ProbModelPup
 int p_QS = 1;
 int code_ACKCONNECT = 1;
-
-int row = 0;
-
 int y;
-int active = 1;
 
-int G = 1;
-clock x1, T, desc;
-</declaration>
+//ProbModelSub/Also uses G
+int s_QS=0;
+int E;
+int suback = 64;
+int ms;
+int msg;
+
+//database. Also uses PUBLISH1
+int row = 0;</declaration>
 	<template>
 		<name>Database</name>
 		<location id="id0" x="0" y="0">
@@ -216,43 +234,51 @@ clock x1, T, desc;
 		<transition>
 			<source ref="id33"/>
 			<target ref="id15"/>
+			<label kind="assignment" x="-509" y="84">E:=30</label>
 			<nail x="-527" y="76"/>
 		</transition>
 		<transition>
 			<source ref="id21"/>
 			<target ref="id33"/>
+			<label kind="guard" x="85" y="119">E&lt;6</label>
 			<nail x="229" y="110"/>
 		</transition>
 		<transition>
 			<source ref="id17"/>
 			<target ref="id21"/>
+			<label kind="guard" x="-110" y="34">ms&gt;1 &amp;&amp; msg == 6</label>
 			<nail x="-238" y="25"/>
 			<nail x="195" y="34"/>
 		</transition>
 		<transition>
 			<source ref="id20"/>
 			<target ref="id18"/>
+			<label kind="guard" x="8" y="-161">suback == 128</label>
 			<nail x="161" y="-136"/>
 			<nail x="-42" y="-136"/>
 		</transition>
 		<transition>
 			<source ref="id32"/>
 			<target ref="id18"/>
+			<label kind="guard" x="-127" y="-178">msg == 0</label>
 		</transition>
 		<transition>
 			<source ref="id32"/>
 			<target ref="id15"/>
+			<label kind="guard" x="-500" y="-267">msg&lt;0</label>
 			<nail x="-518" y="-229"/>
 		</transition>
 		<transition>
 			<source ref="id31"/>
 			<target ref="id32"/>
 			<label kind="synchronisation" x="-109" y="-250">UNSUBACK?</label>
+			<label kind="assignment" x="-109" y="-233">E--</label>
 		</transition>
 		<transition>
 			<source ref="id30"/>
 			<target ref="id31"/>
 			<label kind="synchronisation" x="69" y="-242">UNSUBSCRIBE!</label>
+			<label kind="assignment" x="110" y="-221">E:=E-2</label>
 		</transition>
 		<transition>
 			<source ref="id21"/>
@@ -262,11 +288,14 @@ clock x1, T, desc;
 		<transition>
 			<source ref="id22"/>
 			<target ref="id21"/>
+			<label kind="guard" x="467" y="0">E&lt;5</label>
 			<nail x="476" y="0"/>
 		</transition>
 		<transition>
 			<source ref="id23"/>
 			<target ref="id21"/>
+			<label kind="guard" x="561" y="-136">s_QS==0</label>
+			<label kind="assignment" x="655" y="-97">s_QS++</label>
 			<nail x="637" y="-144"/>
 			<nail x="493" y="-136"/>
 		</transition>
@@ -274,82 +303,102 @@ clock x1, T, desc;
 			<source ref="id29"/>
 			<target ref="id21"/>
 			<label kind="synchronisation" x="562" y="-229">PUBACK1?</label>
+			<label kind="assignment" x="562" y="-212">E:=E-2</label>
 			<nail x="544" y="-212"/>
 			<nail x="433" y="-153"/>
 		</transition>
 		<transition>
 			<source ref="id23"/>
 			<target ref="id29"/>
+			<label kind="guard" x="743" y="-165">s_QS==1</label>
+			<label kind="assignment" x="743" y="-131">s_QS++</label>
 		</transition>
 		<transition>
 			<source ref="id26"/>
 			<target ref="id22"/>
 			<label kind="synchronisation" x="616" y="12">PINGRESP?</label>
+			<label kind="assignment" x="616" y="29">E--, G:=1</label>
 		</transition>
 		<transition>
 			<source ref="id27"/>
 			<target ref="id26"/>
 			<label kind="synchronisation" x="536" y="93">PINGREQ!</label>
+			<label kind="assignment" x="536" y="110">E:=E-2</label>
 		</transition>
 		<transition>
 			<source ref="id22"/>
 			<target ref="id27"/>
+			<label kind="guard" x="518" y="22">E==15</label>
+			<label kind="assignment" x="527" y="34">G:=0</label>
 		</transition>
 		<transition>
 			<source ref="id28"/>
 			<target ref="id21"/>
 			<label kind="synchronisation" x="416" y="59">PUBCOMP1?</label>
+			<label kind="assignment" x="416" y="76">E:=E-2</label>
 		</transition>
 		<transition>
 			<source ref="id25"/>
 			<target ref="id28"/>
 			<label kind="synchronisation" x="603" y="170">PUBREL1?</label>
+			<label kind="assignment" x="510" y="204">E--</label>
 		</transition>
 		<transition>
 			<source ref="id24"/>
 			<target ref="id25"/>
 			<label kind="synchronisation" x="909" y="59">PUBREC1?</label>
+			<label kind="assignment" x="909" y="76">E:=E-2</label>
 		</transition>
 		<transition>
 			<source ref="id23"/>
 			<target ref="id24"/>
+			<label kind="guard" x="766" y="-85">s_QS==2</label>
+			<label kind="assignment" x="766" y="-51">s_QS++</label>
 		</transition>
 		<transition>
 			<source ref="id22"/>
 			<target ref="id23"/>
 			<label kind="synchronisation" x="604" y="-68">PUBLISH1!</label>
+			<label kind="assignment" x="646" y="-51">E--</label>
 		</transition>
 		<transition>
 			<source ref="id21"/>
 			<target ref="id22"/>
+			<label kind="guard" x="476" y="-76">E&gt;5</label>
 		</transition>
 		<transition>
 			<source ref="id20"/>
 			<target ref="id21"/>
+			<label kind="guard" x="247" y="-85">suback!=128</label>
 		</transition>
 		<transition>
 			<source ref="id19"/>
 			<target ref="id20"/>
 			<label kind="synchronisation" x="69" y="-68">SUBACK?</label>
+			<label kind="assignment" x="69" y="-51">E--</label>
 		</transition>
 		<transition>
 			<source ref="id18"/>
 			<target ref="id19"/>
 			<label kind="synchronisation" x="-109" y="-68">SUBSCRIBE?</label>
+			<label kind="assignment" x="-102" y="-51">E:=E-2</label>
 		</transition>
 		<transition>
 			<source ref="id17"/>
 			<target ref="id18"/>
+			<label kind="guard" x="-288" y="-85">ms==1 || msg&lt;6</label>
 		</transition>
 		<transition>
 			<source ref="id16"/>
 			<target ref="id17"/>
 			<label kind="synchronisation" x="-458" y="-68">CONNACK?</label>
+			<label kind="assignment" x="-458" y="-51">E--</label>
 		</transition>
 		<transition>
 			<source ref="id15"/>
 			<target ref="id16"/>
 			<label kind="synchronisation" x="-619" y="-68">CONNECT?</label>
+			<label kind="assignment" x="-619" y="-51">E:=E-2, ms--</label>
 		</transition>
 		<transition>
 			<source ref="id14"/>
