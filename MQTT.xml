@@ -254,7 +254,7 @@ clock x1, T, desc;
 		<transition>
 			<source ref="id25"/>
 			<target ref="id21"/>
-			<label kind="synchronisation" x="616" y="12">PINGRESP!</label>
+			<label kind="synchronisation" x="616" y="12">PINGRESP?</label>
 		</transition>
 		<transition>
 			<source ref="id26"/>
@@ -608,17 +608,17 @@ MQTTsubscribe = MQTTsubscriber();
 Sub = MQTTsub();
 Unsub = MQTTunsub();
 Con = MQTTConnect();
-ProbPup = PropModelPub();
-PropSub = PropModelSub();
+PropPup = ProbModelPub();
+PropSub = ProbModelSub();
 
 Worker = WorkerController();
 Gateway = GatewayController();
 // List one or more processes to be composed into a system.
-system MQTTpublish, MQTTsubscribe, Sub, Unsub, Con, PropPup, PropSub;
+system MQTTpublish, MQTTsubscribe, Sub, Unsub, Con, PropPup, PropSub, Worker, Gateway;
     </system>
 	<queries>
 		<query>
-			<formula></formula>
+			<formula>A[] not deadlock</formula>
 			<comment></comment>
 		</query>
 	</queries>
