@@ -74,6 +74,7 @@ int row = 0;</declaration>
 		<location id="id7" x="816" y="0">
 		</location>
 		<location id="id8" x="654" y="-102">
+			<name x="644" y="-136">publish</name>
 		</location>
 		<location id="id9" x="654" y="-187">
 		</location>
@@ -229,6 +230,7 @@ int row = 0;</declaration>
 		<location id="id32" x="-127" y="-238">
 		</location>
 		<location id="id33" x="-187" y="93">
+			<name x="-197" y="59">reset</name>
 		</location>
 		<init ref="id14"/>
 		<transition>
@@ -347,12 +349,13 @@ int row = 0;</declaration>
 			<source ref="id24"/>
 			<target ref="id25"/>
 			<label kind="synchronisation" x="909" y="59">PUBREC1?</label>
-			<label kind="assignment" x="909" y="76">E:=E-2</label>
+			<label kind="assignment" x="909" y="76">E:=E-2,
+s_QS = 0</label>
 		</transition>
 		<transition>
 			<source ref="id23"/>
 			<target ref="id24"/>
-			<label kind="guard" x="766" y="-85">s_QS==2</label>
+			<label kind="guard" x="766" y="-85">s_QS&gt;=2</label>
 			<label kind="assignment" x="766" y="-51">s_QS++</label>
 		</transition>
 		<transition>
@@ -699,6 +702,14 @@ system MQTTpublish, MQTTsubscribe, Sub, Unsub, Con, PropPup, PropSub, Worker, Ga
 	<queries>
 		<query>
 			<formula>A[] not deadlock</formula>
+			<comment></comment>
+		</query>
+		<query>
+			<formula>E&lt;&gt; PropSub.reset</formula>
+			<comment></comment>
+		</query>
+		<query>
+			<formula>E&lt;&gt; PropPup.publish</formula>
 			<comment></comment>
 		</query>
 	</queries>
