@@ -209,7 +209,7 @@ int row = 0;</declaration>
 		<location id="id22" x="586" y="-51">
 		</location>
 		<location id="id23" x="748" y="-51">
-			<name x="738" y="-85">PUB_ACK</name>
+			<name x="722" y="-85">PUB_ACK</name>
 			<committed/>
 		</location>
 		<location id="id24" x="909" y="-51">
@@ -722,7 +722,7 @@ system MQTTpublish, MQTTsubscribe, Sub, Unsub, Con, PropPup, PropSub, Worker, Ga
 			<comment></comment>
 		</query>
 		<query>
-			<formula>jhg</formula>
+			<formula></formula>
 			<comment></comment>
 		</query>
 	</queries>

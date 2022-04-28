@@ -214,6 +214,7 @@ int row = 0;</declaration>
 		<location id="id22" x="578" y="-34">
 		</location>
 		<location id="id23" x="748" y="-34">
+			<name x="738" y="-68">PUB_ACK</name>
 			<committed/>
 		</location>
 		<location id="id24" x="918" y="-34">
@@ -753,6 +754,14 @@ system MQTTpublish, MQTTsubscribe, Sub, Unsub, Con, PropPup, PropSub, Worker, Ga
 		</query>
 		<query>
 			<formula>E&lt;&gt; MQTTsubscribe.PingReq</formula>
+			<comment></comment>
+		</query>
+		<query>
+			<formula>E&lt;&gt;(PropSub.PUB_ACK and x1 &lt; 100)</formula>
+			<comment></comment>
+		</query>
+		<query>
+			<formula>E&lt;&gt; MQTTpublish.B9</formula>
 			<comment></comment>
 		</query>
 	</queries>
