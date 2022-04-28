@@ -209,6 +209,7 @@ int row = 0;</declaration>
 		<location id="id22" x="586" y="-51">
 		</location>
 		<location id="id23" x="748" y="-51">
+			<name x="738" y="-85">PUB_ACK</name>
 			<committed/>
 		</location>
 		<location id="id24" x="909" y="-51">
@@ -464,7 +465,7 @@ s_QS = 0</label>
 			<name x="-248" y="-34">B12</name>
 		</location>
 		<location id="id39" x="0" y="-8">
-			<name x="-10" y="-42">end_RECIEVE</name>
+			<name x="-51" y="-51">end_RECIEVE</name>
 		</location>
 		<location id="id40" x="85" y="-8">
 			<name x="75" y="-42">B8</name>
@@ -509,14 +510,14 @@ s_QS = 0</label>
 		<transition>
 			<source ref="id37"/>
 			<target ref="id39"/>
-			<label kind="synchronisation" x="-84" y="-21">PUBLISH?</label>
+			<label kind="synchronisation" x="-85" y="-34">PUBLISH?</label>
 		</transition>
 		<transition>
 			<source ref="id37"/>
 			<target ref="id37"/>
-			<label kind="guard" x="-160" y="29">x1&gt;T&amp;&amp;desc&gt;0</label>
-			<label kind="synchronisation" x="-160" y="46">DISCONN!</label>
-			<label kind="assignment" x="-160" y="63">x1:=0</label>
+			<label kind="guard" x="-144" y="93">x1&gt;T&amp;&amp;desc&gt;0</label>
+			<label kind="synchronisation" x="-136" y="127">DISCONN!</label>
+			<label kind="assignment" x="-119" y="76">x1:=0</label>
 			<nail x="-178" y="127"/>
 			<nail x="-17" y="119"/>
 		</transition>
@@ -582,7 +583,7 @@ s_QS = 0</label>
 		<transition>
 			<source ref="id44"/>
 			<target ref="id51"/>
-			<label kind="synchronisation" x="-449" y="-59">pub_broc?</label>
+			<label kind="synchronisation" x="-450" y="-68">pub_broc?</label>
 		</transition>
 		<transition>
 			<source ref="id50"/>
@@ -710,6 +711,18 @@ system MQTTpublish, MQTTsubscribe, Sub, Unsub, Con, PropPup, PropSub, Worker, Ga
 		</query>
 		<query>
 			<formula>E&lt;&gt; PropPup.publish</formula>
+			<comment></comment>
+		</query>
+		<query>
+			<formula>E&lt;&gt;(PropSub.PUB_ACK and x1 &lt; 100)</formula>
+			<comment></comment>
+		</query>
+		<query>
+			<formula>E&lt;&gt; MQTTpublish.B9</formula>
+			<comment></comment>
+		</query>
+		<query>
+			<formula>jhg</formula>
 			<comment></comment>
 		</query>
 	</queries>
