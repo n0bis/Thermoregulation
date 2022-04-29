@@ -17,7 +17,7 @@ chan PINGREQ, PINGRESP, DISCONN, pub_broc;
 chan PUBLISH1,PUBACK1, PUBREC1, PUBREL1, PUBCOMP1;
 int active = 1;
 int G = 1;
-
+chan PUBONE, PUBZERO;
 //MQTTpublisher
 chan PUBLISH, PUBACK, PUBREC, PUBREL, PUBCOMP;
 clock x1, T, desc;
@@ -29,6 +29,7 @@ chan temp_sensor1, temp_sensor2;
 int p_QS = 1;
 int code_ACKCONNECT = 1;
 int y;
+chan data;
 
 //ProbModelSub/Also uses G
 int s_QS=0;
@@ -47,7 +48,22 @@ int row = 0;</declaration>
 		<transition>
 			<source ref="id0"/>
 			<target ref="id0"/>
-			<label kind="synchronisation" x="18" y="-51">PUBLISH1?</label>
+			<label kind="synchronisation" x="-75" y="-46">PUBONE?</label>
+			<label kind="assignment" x="-75" y="-29">row++</label>
+			<nail x="-93" y="-59"/>
+		</transition>
+		<transition>
+			<source ref="id0"/>
+			<target ref="id0"/>
+			<label kind="synchronisation" x="-68" y="8">PUBZERO?</label>
+			<label kind="assignment" x="-58" y="29">row++</label>
+			<nail x="-44" y="106"/>
+			<nail x="-86" y="55"/>
+		</transition>
+		<transition>
+			<source ref="id0"/>
+			<target ref="id0"/>
+			<label kind="synchronisation" x="18" y="-51">PUBCOMP1?</label>
 			<label kind="assignment" x="18" y="-34">row++</label>
 			<nail x="119" y="-68"/>
 			<nail x="59" y="25"/>
@@ -132,7 +148,7 @@ int row = 0;</declaration>
 			<source ref="id5"/>
 			<target ref="id8"/>
 			<label kind="guard" x="680" y="-68">y&lt;15</label>
-			<label kind="synchronisation" x="680" y="-85">PUBLISH!</label>
+			<label kind="synchronisation" x="663" y="-85">PUBLISH!</label>
 			<label kind="assignment" x="680" y="-51">y++</label>
 			<nail x="612" y="-34"/>
 			<nail x="680" y="-34"/>
@@ -453,6 +469,7 @@ s_QS = 0</label>
 		<transition>
 			<source ref="id36"/>
 			<target ref="id35"/>
+			<label kind="synchronisation" x="-416" y="59">PUBLISH?</label>
 			<nail x="-391" y="68"/>
 		</transition>
 		<transition>
@@ -595,7 +612,38 @@ s_QS = 0</label>
 		<location id="id53" x="-510" y="-34">
 			<name x="-520" y="-68">B14</name>
 		</location>
+		<location id="id54" x="-221" y="34">
+		</location>
+		<location id="id55" x="-229" y="-102">
+		</location>
 		<init ref="id46"/>
+		<transition>
+			<source ref="id55"/>
+			<target ref="id46"/>
+			<nail x="-229" y="-153"/>
+			<nail x="-612" y="-153"/>
+		</transition>
+		<transition>
+			<source ref="id54"/>
+			<target ref="id50"/>
+		</transition>
+		<transition>
+			<source ref="id49"/>
+			<target ref="id54"/>
+			<label kind="guard" x="-289" y="0">s_QS==2</label>
+		</transition>
+		<transition>
+			<source ref="id50"/>
+			<target ref="id55"/>
+			<label kind="guard" x="-204" y="-85">s_QS==1</label>
+			<label kind="synchronisation" x="-204" y="-102">PUBONE!</label>
+		</transition>
+		<transition>
+			<source ref="id49"/>
+			<target ref="id55"/>
+			<label kind="guard" x="-323" y="-102">s_QS==0</label>
+			<label kind="synchronisation" x="-297" y="-85">PUBZERO!</label>
+		</transition>
 		<transition>
 			<source ref="id53"/>
 			<target ref="id46"/>
@@ -640,7 +688,7 @@ s_QS = 0</label>
 		<transition>
 			<source ref="id49"/>
 			<target ref="id50"/>
-			<label kind="synchronisation" x="-246" y="-17">PUBACK1!</label>
+			<label kind="synchronisation" x="-255" y="-51">PUBACK1!</label>
 		</transition>
 		<transition>
 			<source ref="id48"/>
@@ -662,61 +710,61 @@ s_QS = 0</label>
 	<template>
 		<name x="5" y="5">MQTTsub</name>
 		<declaration>// Place local declarations here.</declaration>
-		<location id="id54" x="0" y="0">
+		<location id="id56" x="0" y="0">
 			<name x="-10" y="-34">B2</name>
 		</location>
-		<location id="id55" x="-127" y="0">
+		<location id="id57" x="-127" y="0">
 			<name x="-137" y="-34">B3</name>
 		</location>
-		<init ref="id54"/>
+		<init ref="id56"/>
 		<transition>
-			<source ref="id54"/>
-			<target ref="id55"/>
+			<source ref="id56"/>
+			<target ref="id57"/>
 			<label kind="synchronisation" x="-102" y="-25">SUBSCRIBE!</label>
 		</transition>
 		<transition>
-			<source ref="id55"/>
-			<target ref="id54"/>
+			<source ref="id57"/>
+			<target ref="id56"/>
 			<label kind="synchronisation" x="-102" y="68">SUBACK!</label>
 			<nail x="-68" y="68"/>
 		</transition>
 	</template>
 	<template>
 		<name>MQTTunsub</name>
-		<location id="id56" x="34" y="0">
+		<location id="id58" x="34" y="0">
 		</location>
-		<location id="id57" x="-127" y="0">
-		</location>
-		<init ref="id56"/>
-		<transition>
-			<source ref="id57"/>
-			<target ref="id56"/>
-			<label kind="synchronisation" x="-85" y="68">UNSUBACK!</label>
-			<nail x="-51" y="68"/>
-		</transition>
-		<transition>
-			<source ref="id56"/>
-			<target ref="id57"/>
-			<label kind="synchronisation" x="-93" y="-17">UNSUBSCRIBE?</label>
-		</transition>
-	</template>
-	<template>
-		<name>MQTTConnect</name>
-		<location id="id58" x="0" y="0">
-		</location>
-		<location id="id59" x="136" y="0">
+		<location id="id59" x="-127" y="0">
 		</location>
 		<init ref="id58"/>
 		<transition>
 			<source ref="id59"/>
 			<target ref="id58"/>
+			<label kind="synchronisation" x="-85" y="68">UNSUBACK!</label>
+			<nail x="-51" y="68"/>
+		</transition>
+		<transition>
+			<source ref="id58"/>
+			<target ref="id59"/>
+			<label kind="synchronisation" x="-93" y="-17">UNSUBSCRIBE?</label>
+		</transition>
+	</template>
+	<template>
+		<name>MQTTConnect</name>
+		<location id="id60" x="0" y="0">
+		</location>
+		<location id="id61" x="136" y="0">
+		</location>
+		<init ref="id60"/>
+		<transition>
+			<source ref="id61"/>
+			<target ref="id60"/>
 			<label kind="synchronisation" x="42" y="-102">CONNACK!</label>
 			<nail x="136" y="-17"/>
 			<nail x="76" y="-85"/>
 		</transition>
 		<transition>
-			<source ref="id58"/>
-			<target ref="id59"/>
+			<source ref="id60"/>
+			<target ref="id61"/>
 			<label kind="synchronisation" x="25" y="0">CONNECT!</label>
 		</transition>
 	</template>
