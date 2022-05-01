@@ -1,7 +1,6 @@
-'use strict'
-
 const httpProxy = require('http-proxy')
 const apiProxy = httpProxy.createProxyServer()
+const CodeGeneratorController = require('./controllers/CodeGeneratorController')
 
 // location of our exported language server
 const LANGUAGE_SERVER = 'http://localhost:8090/'
@@ -26,4 +25,7 @@ module.exports = (app) => {
   app.all('/xtext-service/*', function (req, res) {
     apiProxy.web(req, res, { target: LANGUAGE_SERVER })
   })
+
+  app.post('/compile',
+    CodeGeneratorController.compileToJS)
 }
