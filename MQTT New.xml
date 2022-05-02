@@ -17,9 +17,10 @@ chan PINGREQ, PINGRESP, DISCONN, pub_broc;
 chan PUBLISH1,PUBACK1, PUBREC1, PUBREL1, PUBCOMP1;
 int active = 1;
 int G = 1;
+int AwaitingPing=0;
 chan PUBONE, PUBZERO;
 //MQTTpublisher
-chan PUBLISH, PUBACK, PUBREC, PUBREL, PUBCOMP;
+chan PUBLISH, PUBACK, PUBREC, PUBREL, PUBCOMP, PUBLISHGATEWAY;
 clock x1, T, desc;
 
 //Workercontroler/gatewayController
@@ -32,7 +33,7 @@ int y;
 chan data;
 
 //ProbModelSub/Also uses G
-int s_QS=0;
+int s_QS=1;
 int E;
 int suback = 64;
 int ms;
@@ -86,8 +87,10 @@ int row = 0;</declaration>
 		<location id="id5" x="510" y="0">
 		</location>
 		<location id="id6" x="680" y="0">
+			<name x="697" y="-34">PingReq</name>
 		</location>
 		<location id="id7" x="816" y="0">
+			<name x="806" y="-34">PingResp</name>
 		</location>
 		<location id="id8" x="680" y="-102">
 			<name x="697" y="-110">publish</name>
@@ -148,7 +151,7 @@ int row = 0;</declaration>
 			<source ref="id5"/>
 			<target ref="id8"/>
 			<label kind="guard" x="680" y="-68">y&lt;15</label>
-			<label kind="synchronisation" x="663" y="-85">PUBLISH!</label>
+			<label kind="synchronisation" x="680" y="-85">PUBLISH!</label>
 			<label kind="assignment" x="680" y="-51">y++</label>
 			<nail x="612" y="-34"/>
 			<nail x="680" y="-34"/>
@@ -174,7 +177,7 @@ int row = 0;</declaration>
 		<transition>
 			<source ref="id7"/>
 			<target ref="id5"/>
-			<label kind="synchronisation" x="630" y="59">PINGRESP!</label>
+			<label kind="synchronisation" x="630" y="59">PINGRESP?</label>
 			<label kind="assignment" x="630" y="76">y:=6</label>
 			<nail x="816" y="76"/>
 			<nail x="612" y="76"/>
@@ -207,6 +210,7 @@ int row = 0;</declaration>
 		<transition>
 			<source ref="id1"/>
 			<target ref="id2"/>
+			<label kind="assignment" x="25" y="0">y=0</label>
 		</transition>
 	</template>
 	<template>
@@ -240,6 +244,7 @@ int row = 0;</declaration>
 		<location id="id26" x="646" y="102">
 		</location>
 		<location id="id27" x="510" y="102">
+			<name x="476" y="110">PingReq</name>
 		</location>
 		<location id="id28" x="408" y="204">
 		</location>
@@ -320,7 +325,6 @@ int row = 0;</declaration>
 			<source ref="id23"/>
 			<target ref="id21"/>
 			<label kind="guard" x="561" y="-136">s_QS==0</label>
-			<label kind="assignment" x="569" y="-119">s_QS++</label>
 			<nail x="680" y="-136"/>
 			<nail x="510" y="-136"/>
 		</transition>
@@ -336,13 +340,12 @@ int row = 0;</declaration>
 			<source ref="id23"/>
 			<target ref="id29"/>
 			<label kind="guard" x="748" y="-161">s_QS==1</label>
-			<label kind="assignment" x="748" y="-144">s_QS++</label>
 		</transition>
 		<transition>
 			<source ref="id26"/>
 			<target ref="id22"/>
 			<label kind="synchronisation" x="620" y="34">PINGRESP?</label>
-			<label kind="assignment" x="629" y="51">E--, G:=1</label>
+			<label kind="assignment" x="629" y="51">E--, G:=1, AwaitingPing=0</label>
 		</transition>
 		<transition>
 			<source ref="id27"/>
@@ -353,8 +356,9 @@ int row = 0;</declaration>
 		<transition>
 			<source ref="id22"/>
 			<target ref="id27"/>
-			<label kind="guard" x="501" y="25">E==15</label>
-			<label kind="assignment" x="501" y="42">G:=0</label>
+			<label kind="guard" x="501" y="25">E==15&amp;&amp;active!=1</label>
+			<label kind="assignment" x="501" y="42">G:=0,
+AwaitingPing=1</label>
 		</transition>
 		<transition>
 			<source ref="id28"/>
@@ -372,19 +376,17 @@ int row = 0;</declaration>
 			<source ref="id24"/>
 			<target ref="id25"/>
 			<label kind="synchronisation" x="926" y="59">PUBREC1?</label>
-			<label kind="assignment" x="926" y="76">E:=E-2,
-s_QS = 0</label>
+			<label kind="assignment" x="926" y="76">E:=E-2</label>
 		</transition>
 		<transition>
 			<source ref="id23"/>
 			<target ref="id24"/>
 			<label kind="guard" x="790" y="-68">s_QS&gt;=2</label>
-			<label kind="assignment" x="799" y="-51">s_QS++</label>
 		</transition>
 		<transition>
 			<source ref="id22"/>
 			<target ref="id23"/>
-			<label kind="synchronisation" x="620" y="-34">PUBLISH1!</label>
+			<label kind="synchronisation" x="620" y="-34">PUBLISH1?</label>
 			<label kind="assignment" x="637" y="-17">E--</label>
 		</transition>
 		<transition>
@@ -460,7 +462,15 @@ s_QS = 0</label>
 		</location>
 		<location id="id36" x="-306" y="0">
 		</location>
+		<location id="id37" x="-399" y="68">
+		</location>
 		<init ref="id35"/>
+		<transition>
+			<source ref="id37"/>
+			<target ref="id35"/>
+			<label kind="synchronisation" x="-561" y="76">PUBLISHGATEWAY!</label>
+			<nail x="-476" y="68"/>
+		</transition>
 		<transition>
 			<source ref="id35"/>
 			<target ref="id36"/>
@@ -468,9 +478,9 @@ s_QS = 0</label>
 		</transition>
 		<transition>
 			<source ref="id36"/>
-			<target ref="id35"/>
-			<label kind="synchronisation" x="-416" y="59">PUBLISH?</label>
-			<nail x="-391" y="68"/>
+			<target ref="id37"/>
+			<label kind="synchronisation" x="-374" y="76">PUBLISH?</label>
+			<nail x="-306" y="68"/>
 		</transition>
 		<transition>
 			<source ref="id35"/>
@@ -481,92 +491,93 @@ s_QS = 0</label>
 	</template>
 	<template>
 		<name>MQTTpublisher</name>
-		<location id="id37" x="-170" y="0">
+		<location id="id38" x="-170" y="0">
 			<name x="-178" y="8">start</name>
 		</location>
-		<location id="id38" x="-340" y="0">
+		<location id="id39" x="-340" y="0">
 			<name x="-357" y="8">PingReq</name>
+			<committed/>
 		</location>
-		<location id="id39" x="-34" y="0">
-			<name x="-44" y="-34">end_RECIEVE</name>
+		<location id="id40" x="25" y="0">
+			<name x="-17" y="-34">end_RECIEVE</name>
 		</location>
-		<location id="id40" x="68" y="0">
-			<name x="58" y="-34">B8</name>
+		<location id="id41" x="127" y="0">
+			<name x="117" y="-34">B8</name>
 		</location>
-		<location id="id41" x="170" y="0">
-			<name x="161" y="8">B9</name>
+		<location id="id42" x="229" y="0">
+			<name x="220" y="8">B9</name>
 		</location>
-		<location id="id42" x="272" y="0">
-			<name x="262" y="-34">B10</name>
+		<location id="id43" x="331" y="0">
+			<name x="321" y="-34">B10</name>
 		</location>
-		<location id="id43" x="272" y="-170">
-			<name x="262" y="-204">B11</name>
+		<location id="id44" x="331" y="-170">
+			<name x="321" y="-204">B11</name>
 		</location>
-		<location id="id44" x="102" y="68">
+		<location id="id45" x="161" y="68">
 		</location>
-		<location id="id45" x="68" y="-68">
+		<location id="id46" x="127" y="-68">
 		</location>
-		<init ref="id37"/>
+		<init ref="id38"/>
 		<transition>
-			<source ref="id41"/>
-			<target ref="id45"/>
-			<label kind="guard" x="136" y="-85">p_QS==1</label>
-			<nail x="170" y="-68"/>
-		</transition>
-		<transition>
-			<source ref="id44"/>
-			<target ref="id41"/>
-		</transition>
-		<transition>
-			<source ref="id40"/>
-			<target ref="id44"/>
-			<label kind="guard" x="17" y="34">p_QS==2</label>
+			<source ref="id42"/>
+			<target ref="id46"/>
+			<label kind="guard" x="195" y="-85">p_QS==1</label>
+			<nail x="229" y="-68"/>
 		</transition>
 		<transition>
 			<source ref="id45"/>
-			<target ref="id37"/>
+			<target ref="id42"/>
+		</transition>
+		<transition>
+			<source ref="id41"/>
+			<target ref="id45"/>
+			<label kind="guard" x="76" y="34">p_QS==2</label>
+		</transition>
+		<transition>
+			<source ref="id46"/>
+			<target ref="id38"/>
 			<nail x="-102" y="-68"/>
 		</transition>
 		<transition>
-			<source ref="id40"/>
-			<target ref="id45"/>
-			<label kind="guard" x="76" y="-59">p_QS==0</label>
+			<source ref="id41"/>
+			<target ref="id46"/>
+			<label kind="guard" x="135" y="-59">p_QS==0</label>
 		</transition>
 		<transition>
-			<source ref="id43"/>
-			<target ref="id37"/>
+			<source ref="id44"/>
+			<target ref="id38"/>
 			<label kind="synchronisation" x="-195" y="-195">PUBCOMP!</label>
 			<nail x="-170" y="-170"/>
 			<nail x="-170" y="-76"/>
 		</transition>
 		<transition>
+			<source ref="id43"/>
+			<target ref="id44"/>
+			<label kind="synchronisation" x="339" y="-93">PUBREL!</label>
+		</transition>
+		<transition>
 			<source ref="id42"/>
 			<target ref="id43"/>
-			<label kind="synchronisation" x="280" y="-93">PUBREL!</label>
+			<label kind="synchronisation" x="246" y="0">PUBREC!</label>
 		</transition>
 		<transition>
 			<source ref="id41"/>
 			<target ref="id42"/>
-			<label kind="synchronisation" x="187" y="0">PUBREC!</label>
+			<label kind="synchronisation" x="144" y="0">PUBACK!</label>
 		</transition>
 		<transition>
 			<source ref="id40"/>
 			<target ref="id41"/>
-			<label kind="synchronisation" x="85" y="0">PUBACK!</label>
+			<label kind="synchronisation" x="42" y="0">pub_broc!</label>
 		</transition>
 		<transition>
-			<source ref="id39"/>
+			<source ref="id38"/>
 			<target ref="id40"/>
-			<label kind="synchronisation" x="-17" y="0">pub_broc!</label>
+			<label kind="synchronisation" x="-144" y="-17">PUBLISHGATEWAY?</label>
 		</transition>
 		<transition>
-			<source ref="id37"/>
-			<target ref="id39"/>
-			<label kind="synchronisation" x="-136" y="-17">PUBLISH?</label>
-		</transition>
-		<transition>
-			<source ref="id37"/>
-			<target ref="id37"/>
+			<source ref="id38"/>
+			<target ref="id38"/>
 			<label kind="guard" x="-204" y="68">x1&gt;T&amp;&amp;desc&gt;0</label>
 			<label kind="synchronisation" x="-187" y="85">DISCONN!</label>
 			<label kind="assignment" x="-170" y="102">x1:=0</label>
@@ -574,197 +585,201 @@ s_QS = 0</label>
 			<nail x="-102" y="68"/>
 		</transition>
 		<transition>
-			<source ref="id38"/>
-			<target ref="id37"/>
+			<source ref="id39"/>
+			<target ref="id38"/>
 			<label kind="synchronisation" x="-340" y="-85">PINGRESP!</label>
 			<nail x="-340" y="-68"/>
 			<nail x="-272" y="-68"/>
 		</transition>
 		<transition>
-			<source ref="id37"/>
-			<target ref="id38"/>
+			<source ref="id38"/>
+			<target ref="id39"/>
 			<label kind="synchronisation" x="-272" y="0">PINGREQ?</label>
 		</transition>
 	</template>
 	<template>
 		<name>MQTTsubscriber</name>
-		<location id="id46" x="-646" y="-34">
+		<location id="id47" x="-646" y="-34">
 			<name x="-646" y="-25">start</name>
 		</location>
-		<location id="id47" x="-825" y="-34">
+		<location id="id48" x="-825" y="-34">
 			<name x="-833" y="-25">PingReq</name>
+			<committed/>
 		</location>
-		<location id="id48" x="-374" y="-34">
+		<location id="id49" x="-374" y="-34">
 			<name x="-416" y="-68">end_recieve</name>
 		</location>
-		<location id="id49" x="-272" y="-34">
+		<location id="id50" x="-272" y="-34">
 			<name x="-282" y="-68">B15</name>
 		</location>
-		<location id="id50" x="-170" y="-34">
+		<location id="id51" x="-170" y="-34">
 			<name x="-180" y="-68">B16</name>
 		</location>
-		<location id="id51" x="-68" y="-34">
+		<location id="id52" x="-68" y="-34">
 			<name x="-78" y="-68">B17</name>
 		</location>
-		<location id="id52" x="-68" y="-204">
+		<location id="id53" x="-68" y="-204">
 			<name x="-78" y="-238">B18</name>
 		</location>
-		<location id="id53" x="-510" y="-34">
+		<location id="id54" x="-510" y="-34">
 			<name x="-520" y="-68">B14</name>
 		</location>
-		<location id="id54" x="-221" y="34">
+		<location id="id55" x="-221" y="34">
 		</location>
-		<location id="id55" x="-229" y="-102">
+		<location id="id56" x="-229" y="-102">
 		</location>
-		<init ref="id46"/>
+		<init ref="id47"/>
 		<transition>
-			<source ref="id55"/>
-			<target ref="id46"/>
+			<source ref="id56"/>
+			<target ref="id47"/>
 			<nail x="-229" y="-153"/>
 			<nail x="-612" y="-153"/>
 		</transition>
 		<transition>
-			<source ref="id54"/>
-			<target ref="id50"/>
-		</transition>
-		<transition>
-			<source ref="id49"/>
-			<target ref="id54"/>
-			<label kind="guard" x="-289" y="0">s_QS==2</label>
+			<source ref="id55"/>
+			<target ref="id51"/>
 		</transition>
 		<transition>
 			<source ref="id50"/>
 			<target ref="id55"/>
+			<label kind="guard" x="-289" y="0">s_QS==2</label>
+		</transition>
+		<transition>
+			<source ref="id51"/>
+			<target ref="id56"/>
 			<label kind="guard" x="-204" y="-85">s_QS==1</label>
 			<label kind="synchronisation" x="-204" y="-102">PUBONE!</label>
 		</transition>
 		<transition>
-			<source ref="id49"/>
-			<target ref="id55"/>
+			<source ref="id50"/>
+			<target ref="id56"/>
 			<label kind="guard" x="-323" y="-102">s_QS==0</label>
 			<label kind="synchronisation" x="-297" y="-85">PUBZERO!</label>
 		</transition>
 		<transition>
-			<source ref="id53"/>
-			<target ref="id46"/>
+			<source ref="id54"/>
+			<target ref="id47"/>
 			<label kind="guard" x="-603" y="-119">active!=1</label>
 			<nail x="-544" y="-102"/>
 			<nail x="-612" y="-102"/>
 		</transition>
 		<transition>
-			<source ref="id46"/>
-			<target ref="id53"/>
+			<source ref="id47"/>
+			<target ref="id54"/>
 			<label kind="synchronisation" x="-628" y="42">DISCONN?</label>
+			<label kind="assignment" x="-628" y="59">active=0</label>
 			<nail x="-646" y="59"/>
 			<nail x="-553" y="59"/>
 		</transition>
 		<transition>
-			<source ref="id53"/>
-			<target ref="id48"/>
+			<source ref="id54"/>
+			<target ref="id49"/>
 			<label kind="guard" x="-493" y="-34">active&gt;0&amp;&amp; G&gt;0</label>
 		</transition>
 		<transition>
-			<source ref="id46"/>
-			<target ref="id53"/>
+			<source ref="id47"/>
+			<target ref="id54"/>
+			<label kind="guard" x="-628" y="-68">AwaitingPing==0</label>
 			<label kind="synchronisation" x="-628" y="-51">pub_broc?</label>
+			<label kind="assignment" x="-628" y="-34">active=1</label>
 		</transition>
 		<transition>
-			<source ref="id52"/>
-			<target ref="id46"/>
+			<source ref="id53"/>
+			<target ref="id47"/>
 			<label kind="synchronisation" x="-680" y="-221">PUBCOMP1!</label>
 			<nail x="-612" y="-204"/>
 			<nail x="-646" y="-204"/>
 		</transition>
 		<transition>
+			<source ref="id52"/>
+			<target ref="id53"/>
+			<label kind="synchronisation" x="-68" y="-127">PUBREL1!</label>
+		</transition>
+		<transition>
 			<source ref="id51"/>
 			<target ref="id52"/>
-			<label kind="synchronisation" x="-68" y="-127">PUBREL1!</label>
+			<label kind="synchronisation" x="-136" y="-17">PUBREC1!</label>
 		</transition>
 		<transition>
 			<source ref="id50"/>
 			<target ref="id51"/>
-			<label kind="synchronisation" x="-136" y="-17">PUBREC1!</label>
+			<label kind="synchronisation" x="-255" y="-51">PUBACK1!</label>
 		</transition>
 		<transition>
 			<source ref="id49"/>
 			<target ref="id50"/>
-			<label kind="synchronisation" x="-255" y="-51">PUBACK1!</label>
-		</transition>
-		<transition>
-			<source ref="id48"/>
-			<target ref="id49"/>
 			<label kind="synchronisation" x="-365" y="-34">PUBLISH1!</label>
 		</transition>
 		<transition>
-			<source ref="id47"/>
-			<target ref="id46"/>
+			<source ref="id48"/>
+			<target ref="id47"/>
 			<label kind="synchronisation" x="-858" y="-136">PINGRESP!</label>
 			<nail x="-824" y="-119"/>
 		</transition>
 		<transition>
-			<source ref="id46"/>
-			<target ref="id47"/>
+			<source ref="id47"/>
+			<target ref="id48"/>
 			<label kind="synchronisation" x="-765" y="-34">PINGREQ?</label>
 		</transition>
 	</template>
 	<template>
 		<name x="5" y="5">MQTTsub</name>
 		<declaration>// Place local declarations here.</declaration>
-		<location id="id56" x="0" y="0">
+		<location id="id57" x="0" y="0">
 			<name x="-10" y="-34">B2</name>
 		</location>
-		<location id="id57" x="-127" y="0">
+		<location id="id58" x="-127" y="0">
 			<name x="-137" y="-34">B3</name>
 		</location>
-		<init ref="id56"/>
+		<init ref="id57"/>
 		<transition>
-			<source ref="id56"/>
-			<target ref="id57"/>
+			<source ref="id57"/>
+			<target ref="id58"/>
 			<label kind="synchronisation" x="-102" y="-25">SUBSCRIBE!</label>
 		</transition>
 		<transition>
-			<source ref="id57"/>
-			<target ref="id56"/>
+			<source ref="id58"/>
+			<target ref="id57"/>
 			<label kind="synchronisation" x="-102" y="68">SUBACK!</label>
 			<nail x="-68" y="68"/>
 		</transition>
 	</template>
 	<template>
 		<name>MQTTunsub</name>
-		<location id="id58" x="34" y="0">
+		<location id="id59" x="34" y="0">
 		</location>
-		<location id="id59" x="-127" y="0">
+		<location id="id60" x="-127" y="0">
 		</location>
-		<init ref="id58"/>
+		<init ref="id59"/>
 		<transition>
-			<source ref="id59"/>
-			<target ref="id58"/>
+			<source ref="id60"/>
+			<target ref="id59"/>
 			<label kind="synchronisation" x="-85" y="68">UNSUBACK!</label>
 			<nail x="-51" y="68"/>
 		</transition>
 		<transition>
-			<source ref="id58"/>
-			<target ref="id59"/>
+			<source ref="id59"/>
+			<target ref="id60"/>
 			<label kind="synchronisation" x="-93" y="-17">UNSUBSCRIBE?</label>
 		</transition>
 	</template>
 	<template>
 		<name>MQTTConnect</name>
-		<location id="id60" x="0" y="0">
+		<location id="id61" x="0" y="0">
 		</location>
-		<location id="id61" x="136" y="0">
+		<location id="id62" x="136" y="0">
 		</location>
-		<init ref="id60"/>
+		<init ref="id61"/>
 		<transition>
-			<source ref="id61"/>
-			<target ref="id60"/>
+			<source ref="id62"/>
+			<target ref="id61"/>
 			<label kind="synchronisation" x="42" y="-102">CONNACK!</label>
 			<nail x="136" y="-17"/>
 			<nail x="76" y="-85"/>
 		</transition>
 		<transition>
-			<source ref="id60"/>
-			<target ref="id61"/>
+			<source ref="id61"/>
+			<target ref="id62"/>
 			<label kind="synchronisation" x="25" y="0">CONNECT!</label>
 		</transition>
 	</template>
@@ -797,15 +812,19 @@ system MQTTpublish, MQTTsubscribe, Sub, Unsub, Con, PropPup, PropSub, Worker, Ga
 			<comment></comment>
 		</query>
 		<query>
-			<formula>E&lt;&gt; MQTTpublish.PingReq</formula>
+			<formula>E&lt;&gt; MQTTpublish.PingReq imply PropPup.PingReq</formula>
 			<comment></comment>
 		</query>
 		<query>
-			<formula>E&lt;&gt; MQTTsubscribe.PingReq</formula>
+			<formula>E&lt;&gt; MQTTsubscribe.PingReq imply PropSub.PingReq</formula>
 			<comment></comment>
 		</query>
 		<query>
-			<formula>E&lt;&gt;(PropSub.PUB_ACK and x1 &lt; 100)</formula>
+			<formula>[] (PropPup.PingReq -&gt; &lt;&gt; PropPup.PingResp)</formula>
+			<comment></comment>
+		</query>
+		<query>
+			<formula>E&lt;&gt;(PropSub.PUB_ACK and x1 &lt; 0.1)</formula>
 			<comment></comment>
 		</query>
 		<query>
