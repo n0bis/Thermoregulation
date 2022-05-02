@@ -7,6 +7,11 @@ const typeDefs = gql`
   type Company {
     companyID: Int
     companyName: Int
+    categories: [Category!]! @relationship(type: "OWNED_BY", direction: IN)
+    products: [Product!]! @relationship(type: "OWNED_BY", direction: IN)
+    trucks: [Truck!]! @relationship(type: "OWNED_BY", direction: IN)
+    rules: [Rule!]! @relationship(type: "BELONGS_TO", direction: IN)
+    packages: [Package!]! @relationship(type: "OWNED_BY", direction: IN)
   }
 
   type Category {
