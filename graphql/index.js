@@ -4,16 +4,59 @@ const neo4j = require("neo4j-driver");
 require("dotenv").config();
 
 const typeDefs = gql`
-  type Movie {
-    title: String!
-    year: Int
-    plot: String
-    actors: [Person!]! @relationship(type: "ACTED_IN", direction: IN)
+  type Company {
+    companyID: Int
+    companyName: Int
   }
 
-  type Person {
-    name: String!
-    movies: [Movie!]! @relationship(type: "ACTED_IN", direction: OUT)
+  type Category {
+    categoryID: Int
+    categoryName: String
+    companyID: Int
+    company: [Company!]! @relationship(type: "OWNED_BY", direction: OUT)
+  }
+
+  type Product {
+    productID: Int
+    productName: String
+    categoryID: Int
+    companyID: Int
+    category: [Category!]! @relationship(type: "PART_OF", direction: OUT)
+    company: [Company!]! @relationship(type: "OWNED_BY", direction: OUT)
+  }
+
+  type Truck {
+    truckID: Int
+    truckName: String
+    CompanyID: Int
+    company: [Company!]! @relationship(type: "OWNED_BY", direction: OUT)
+  }
+
+  type Temperature {
+    temperatureID: Int
+    value: Float
+    time: DateTime
+    truckID: Int
+    truck: [Truck!]! @relationship(type: "TRACKED", direction: OUT)
+  }
+
+  type Rule {
+    ruleID: Int
+    nameSpace: String
+    conditions: String
+    actions: String
+    companyID: Int
+    company: [Company!]! @relationship(type: "BELONGS_TO", direction: OUT)
+  }
+
+  type Package {
+    packageID: Int
+    companyID: Int
+    shippedDate: DateTime
+    deliveredDate: DateTime
+    truckID: Int
+    truck: [Truck!]! @relationship(type: "BELONGS_TO", direction: OUT)
+    company: [Company!]! @relationship(type: "OWNED_BY", direction: OUT)
   }
 `;
 
