@@ -93,3 +93,17 @@ services:
     restart: always
     depends_on:
       - kafka
+
+  graphql:
+    build:
+      context: ./graphql
+    hostname: graphql
+    container_name: graphql
+    ports:
+      - 4000:4000
+    environment:
+      NEO4J_USER: ${NEO4J_USER}
+      NEO4J_PASSWORD: ${2cool4school}
+      NEO4J_URI: neo4j
+    depends_on:
+      - neo4j
