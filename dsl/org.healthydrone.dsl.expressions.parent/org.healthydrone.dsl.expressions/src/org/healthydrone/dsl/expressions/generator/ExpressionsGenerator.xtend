@@ -7,27 +7,8 @@ import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.xtext.generator.AbstractGenerator
 import org.eclipse.xtext.generator.IFileSystemAccess2
 import org.eclipse.xtext.generator.IGeneratorContext
-import org.healthydrone.dsl.expressions.expressions.Model
-import org.healthydrone.dsl.expressions.expressions.Instruction
-import org.healthydrone.dsl.expressions.expressions.VariableDeclaration
-import org.healthydrone.dsl.expressions.expressions.VarRef
-import org.healthydrone.dsl.expressions.expressions.Assignment
-import org.healthydrone.dsl.expressions.expressions.And
-import org.healthydrone.dsl.expressions.expressions.Or
-import org.healthydrone.dsl.expressions.expressions.Plus
-import org.healthydrone.dsl.expressions.expressions.Minus
-import org.healthydrone.dsl.expressions.expressions.Expo
-import org.healthydrone.dsl.expressions.expressions.Mod
-import org.healthydrone.dsl.expressions.expressions.MulOrDiv
-import org.healthydrone.dsl.expressions.expressions.IntConstant
-import org.healthydrone.dsl.expressions.expressions.Primary
-import org.healthydrone.dsl.expressions.expressions.ArithmeticSigned
-import org.healthydrone.dsl.expressions.expressions.Not
-import org.healthydrone.dsl.expressions.expressions.Equality
-import org.healthydrone.dsl.expressions.expressions.Comparison
-import org.healthydrone.dsl.expressions.expressions.BoolConstant
-import org.healthydrone.dsl.expressions.expressions.StringConstant
-import org.healthydrone.dsl.expressions.expressions.PrintCommand
+import org.healthydrone.dsl.expressions.expressions.RulesModel
+import java.io.File
 
 /**
  * Generates code from your model files on save.
@@ -36,97 +17,37 @@ import org.healthydrone.dsl.expressions.expressions.PrintCommand
  */
 class ExpressionsGenerator extends AbstractGenerator {
 
-	override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorContext context) {
-		var generatedCode= ""
-		var model = resource.contents.head as Model
+override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorContext context) {
+	val rule = resource.allContents.filter(RulesModel).next
+		new File("rules").mkdirs()
+		generateMathFile(rule, "rules", fsa)
+	}
 		
-		for (e : model.instructions.filter(typeof (Instruction))) {
-			generatedCode += e.compile + "\n"; 
-		}
-		
-		fsa.generateFile("generated_code.js" , generatedCode)
+	def generateMathFile(RulesModel rules, String pkgName, IFileSystemAccess2 fsa) {
+		fsa.generateFile(pkgName + "/" + rules.name + ".py", rules.generatePythonClass(pkgName))
 	}
 	
-	def dispatch CharSequence compile(VariableDeclaration it) {
-		'''var «name» = «initExp?.compile»'''
-	}
+	def generatePythonClass (RulesModel rules, String pkgName) '''
+	from neo4j import GraphDatabase
 	
-	def dispatch CharSequence compile(VarRef it) {
-		'''«ref.name»'''
-	}
-	
-	def dispatch CharSequence compile(Assignment it) {
-		'''«v.ref.name» = «exp.compile»'''
-	}
-	
-	def dispatch CharSequence compile(And it) {
-		'''«left.compile»&&«right.compile»'''
-	}
-	
-	def dispatch CharSequence compile(Or it) {
-		'''«left.compile»||«right.compile»'''
-	}
+	uri = "neo4j://localhost:7687"
+	driver = GraphDatabase.driver(uri, auth=("neo4j", "password"))
 
-	def dispatch CharSequence compile(Plus it) {
-		'''«left.compile» + «right.compile»'''
-	}
-	
-	def dispatch CharSequence compile(Minus it) {
-		'''«left.compile» - «right.compile»'''
-	}
-	
-	def dispatch CharSequence compile(Expo it) {
-		'''«left.compile» ** «right.compile»'''
-	}
-	
-	def dispatch CharSequence compile(Mod it) {
-		'''«left.compile» % «right.compile»'''
-	}
-	
-	def dispatch CharSequence compile(MulOrDiv it) {
-		'''«left.compile» «op» «right.compile»'''
-	}
-	
-	def dispatch CharSequence compile(IntConstant it) {
-		'''«value.toString»'''
-	}
-	
-	def dispatch CharSequence compile(Primary it) {
-		'''(«expr.compile»)'''
-	}
-	
-	def dispatch CharSequence compile(ArithmeticSigned it) {
-		'''-«expression.compile»'''
-	}
-	
-	def dispatch CharSequence compile(Not it) {
-		'''!(«expression.compile»)'''
-	}
-	
-	def dispatch CharSequence compile(Equality it) {
-		'''«left.compile»«IF op.equals("==")»===«ELSE»!==«ENDIF»«right.compile»'''
-	}
-	
-	def dispatch CharSequence compile(Comparison it) {
-		'''«left.compile»«op»«right.compile»'''
-	}
-	
-	def dispatch CharSequence compile(BoolConstant it) {
-		'''«value»'''
-	}
-	
-	def dispatch CharSequence compile(StringConstant it) {
-		'''"«value»"'''
-	}
-
-	def dispatch CharSequence compile(PrintCommand it) {
-		val p = params.map(p|"(" + p.compile + ")").join(' + ')
-		'''window.printConsoleOutput(«p»)'''
-	}
-	
+	while True:
 		
-	def dispatch CharSequence compile(Instruction it) {
-		println("ERROR: Unsupported kind of Instruction in ExpressionsGenerator.compile()")
-		'\n'
-	}
+		«FOR r : rules.rules»
+		«IF r.name == 'minTemperature'» 
+		if «r.name» < «r.value»:
+			print("Too cold!")
+		«ENDIF»
+		«IF r.name == 'maxTemperature'» 
+		if «r.name» > «r.value»:
+			print("Too hot!")
+		«ENDIF»
+			
+		«ENDFOR»
+		
+		time.sleep(5)
+
+	'''
 }

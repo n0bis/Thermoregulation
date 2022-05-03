@@ -7,16 +7,16 @@ import com.google.inject.Inject
 import org.eclipse.xtext.testing.InjectWith
 import org.eclipse.xtext.testing.extensions.InjectionExtension
 import org.eclipse.xtext.testing.util.ParseHelper
-import org.healthydrone.dsl.expressions.expressions.Model
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.^extension.ExtendWith
+import org.healthydrone.dsl.expressions.expressions.RulesModel
 
 @ExtendWith(InjectionExtension)
 @InjectWith(ExpressionsInjectorProvider)
 class ExpressionsParsingTest {
 	@Inject
-	ParseHelper<Model> parseHelper
+	ParseHelper<RulesModel> parseHelper
 	
 	@Test
 	def void loadModel() {

@@ -2,99 +2,24 @@ grammar org.healthydrone.dsl.expressions.Expressions with org.eclipse.xtext.comm
 
 generate expressions "http://www.healthydrone.org/dsl/expressions/Expressions"
 
-Model:
-	instructions+=Instruction*
-;
-	
-Instruction:
-	VariableDeclaration
-	| Assignment
-	| GlobalCommand
+RulesModel:
+	'Rule' 'temperature' name=ID
+	rules += Rule* 
+	'end'
 ;
 
-VariableDeclaration:
-	'var' name=ID ('=' initExp=Expression)?
+Rule:
+	 name=AllowedRules value=INT // 'action' action=Action
 ;
 
-VarRef:
-	ref=[VariableDeclaration]
+Action:
+	 name=AllowedActions value=INT 'action' actions+=Action*
 ;
 
-Assignment:
-	v=VarRef '=' exp=Expression
+AllowedActions:
+	'LEDblink' | 'log'
 ;
 
-GlobalCommand:
-		{PrintCommand} 'print' params+=Expression
-;
-
-Expression: Or;
-
-Or returns Expression:
-	And (
-		{Or.left=current} "||" right=And
-	)*
-;
-
-And returns Expression:
-	Equality (
-		{And.left=current} "&&" right=Equality
-	)*
-;
-
-Equality returns Expression:
-	Comparison (
-		{Equality.left=current} op=("==" | "!=")
-		right=Comparison
-	)*
-;
-
-Comparison returns Expression:
-	PlusOrMinus (
-		{Comparison.left=current} op=(">=" | "<=" | ">" | "<")
-		right=PlusOrMinus
-	)*
-;
-
-PlusOrMinus returns Expression:
-	Mod (
-		({Plus.left=current} '+' | {Minus.left=current} '-')
-		right=Mod
-	)*
-;
-
-Mod returns Expression:
-	MulOrDiv (
-		({Mod.left=current} op=('mod' ))
-		right=MulOrDiv
-	)*
-;
-
-MulOrDiv returns Expression:
-	Expo (
-		({MulOrDiv.left=current} op=('*' | '/'))  
-		right=Expo
-	)*
-;
-
-// exponential operator
-Expo returns Expression:
-	Prefixed (
-		({Expo.left=current} op=('^' ))  
-		right=Prefixed
-	)*
-;
-
-Prefixed returns Expression:
-    {Not} =>"!" expression=Atomic | /* right associativity */
-    {ArithmeticSigned} =>"-" expression=Atomic | /* right associativity */
-    Atomic
-;
-
-Atomic returns Expression:
-	  {Primary} '(' expr=Expression ')'
-	| {IntConstant} value=INT
-	| {BoolConstant} value=('true' | 'false')
-	| {StringConstant} value=STRING
-	| VarRef
+AllowedRules:
+	'minTemperature' | 'maxTemperature'
 ;
