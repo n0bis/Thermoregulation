@@ -157,3 +157,4 @@ cython_debug/
 .AppleDouble
 .LSOverride
 .nosync
+*.icloud
