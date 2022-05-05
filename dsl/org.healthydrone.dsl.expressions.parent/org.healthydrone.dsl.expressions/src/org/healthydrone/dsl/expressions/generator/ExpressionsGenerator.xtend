@@ -29,9 +29,10 @@ override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorCo
 	
 	def generatePythonClass (RulesModel rules, String pkgName) '''
 	from neo4j import GraphDatabase
+	import os
 	
 	uri = "neo4j://localhost:7687"
-	driver = GraphDatabase.driver(uri, auth=("neo4j", "password"))
+	driver = GraphDatabase.driver(uri, auth=(os.getenv('NEO4J_USER', 'user'), os.getenv('NEO4J_PASSWORD', 'pass')))
 
 
 	«FOR r : rules.rules»
