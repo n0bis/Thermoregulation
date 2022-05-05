@@ -1,5 +1,2 @@
-truckID, truckName, companyID
-1, Tucker, 1
-2, Betty, 1
-3, The Roadrunner, 2
-4, El Grande, 2
+truckID, truckName
+1, Betty
