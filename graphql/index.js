@@ -5,20 +5,19 @@ require("dotenv").config();
 
 const typeDefs = gql`
   type Truck {
-    truckID: Int
-    truckName: String
+    id: ID! @id
+    name: String
   }
 
   type Temperature {
-    temperatureID: Int
+    id: ID! @id
     value: Float
     time: DateTime
-    truckID: Int
-    truck: [Truck!]! @relationship(type: "TRACKED", direction: OUT)
+    truck: [Truck!]! @relationship(type: "TRACKED_BY", direction: OUT)
   }
 
   type Rule {
-    ruleID: Int
+    id: ID! @id
     nameSpace: String
     conditions: String
     actions: String

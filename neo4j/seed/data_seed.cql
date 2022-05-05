@@ -1,30 +1,11 @@
-LOAD CSV WITH HEADERS FROM 'file:///trucks.csv' AS row
-CREATE (n:Truck)
-SET n = row;
-
-CREATE INDEX ON :Truck(truckID);
-
-MATCH (t:Truck),(c:Company)
-WHERE t.companyID = c.companyID
-CREATE (t)-[:OWNED_BY]->(c);
-
-LOAD CSV WITH HEADERS FROM 'file:///temperatures.csv' AS row
-CREATE (n:Temperature)
-SET n = row,
-n.value = toFloat(row.value);
-
-CREATE INDEX ON :Temperature(temperatureID);
-
-MATCH (temp:Temperature),(t:Truck)
-WHERE temp.truckID = t.truckID
-CREATE (temp)-[:TRACKED]->(t);
-
-LOAD CSV WITH HEADERS FROM 'file:///rules.csv' AS row
-CREATE (n:Rule)
-SET n = row;
-
-CREATE INDEX ON :Rule(ruleID);
-
-MATCH (r:Rule),(c:Company)
-WHERE r.companyID = c.companyID
-CREATE (r)-[:BELONGS_TO]->(c);
+CREATE (truck:Truck {name: 'Betty'})
+CREATE (temperature1:Temperature {value: 16.1, tracked_at: localdatetime()})
+CREATE (temperature2:Temperature {value: 16.3, tracked_at: localdatetime()})
+CREATE (temperature3:Temperature {value: 15.5, tracked_at: localdatetime()})
+CREATE (temperature4:Temperature {value: 16.4, tracked_at: localdatetime()})
+CREATE (rule:Rule {nameSpace: '', conditions: '', actions: ''})
+CREATE
+(temperature1)-[:TRACKED_BY]->(truck),
+(temperature2)-[:TRACKED_BY]->(truck),
+(temperature3)-[:TRACKED_BY]->(truck),
+(temperature4)-[:TRACKED_BY]->(truck)
