@@ -33,21 +33,19 @@ override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorCo
 	uri = "neo4j://localhost:7687"
 	driver = GraphDatabase.driver(uri, auth=("neo4j", "password"))
 
-	while True:
+
+	«FOR r : rules.rules»
+	«IF r.name == 'minTemperature'» 
+	if «r.name» < «r.value»:
+		print("Too cold!")
+	«ENDIF»
+	«IF r.name == 'maxTemperature'» 
+	if «r.name» > «r.value»:
+		print("Too hot!")
+	«ENDIF»
 		
-		«FOR r : rules.rules»
-		«IF r.name == 'minTemperature'» 
-		if «r.name» < «r.value»:
-			print("Too cold!")
-		«ENDIF»
-		«IF r.name == 'maxTemperature'» 
-		if «r.name» > «r.value»:
-			print("Too hot!")
-		«ENDIF»
-			
-		«ENDFOR»
-		
-		time.sleep(5)
+	«ENDFOR»
+	
 
 	'''
 }
