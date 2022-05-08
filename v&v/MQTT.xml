@@ -24,7 +24,7 @@ chan PUBLISH, PUBACK, PUBREC, PUBREL, PUBCOMP, PUBLISHGATEWAY;
 clock x1, T, desc;
 
 //Workercontroler/gatewayController
-chan temp_sensor1, temp_sensor2;
+chan temp_sensor1;
 
 //ProbModelPup
 int p_QS = 2;
@@ -444,13 +444,6 @@ AwaitingPing=1</label>
 		<transition>
 			<source ref="id34"/>
 			<target ref="id34"/>
-			<label kind="synchronisation" x="-153" y="-144">temp_sensor2!</label>
-			<nail x="-110" y="-127"/>
-			<nail x="-110" y="-17"/>
-		</transition>
-		<transition>
-			<source ref="id34"/>
-			<target ref="id34"/>
 			<label kind="synchronisation" x="25" y="-76">temp_sensor1!</label>
 			<nail x="68" y="-51"/>
 			<nail x="76" y="93"/>
@@ -471,11 +464,6 @@ AwaitingPing=1</label>
 			<target ref="id35"/>
 			<label kind="synchronisation" x="-561" y="76">PUBLISHGATEWAY!</label>
 			<nail x="-476" y="68"/>
-		</transition>
-		<transition>
-			<source ref="id35"/>
-			<target ref="id36"/>
-			<label kind="synchronisation" x="-442" y="0">temp_sensor2?</label>
 		</transition>
 		<transition>
 			<source ref="id36"/>
