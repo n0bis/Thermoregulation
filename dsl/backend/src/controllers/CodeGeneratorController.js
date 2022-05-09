@@ -31,7 +31,7 @@ module.exports = {
       execSync(`java -jar ${dslCompilerPath} ${dslCodePath}`, { cwd: tmpDir })
       // After the execution of the command, the compiled code will be available
       // within <tmpDir>/src-gen/generated_code.js
-      const generatedPath = path.resolve(tmpDir, 'src-gen', 'generated_code.js')
+      const generatedPath = path.resolve(tmpDir, 'src-gen', 'generated_code.py')
       // Read the generated JavaScript code ...
       const jsCode = await fsPromises.readFile(generatedPath, 'utf-8')
       // ... and send it back to the user
