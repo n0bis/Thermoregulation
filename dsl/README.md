@@ -5,3 +5,10 @@ Right click the ```org.healthydrone.dsl-expressions.web``` run as ```Java Applic
 # Getting the libraries over to frontend
 ```wget --mirror --reject=index.html,style.css -nH -P public/ localhost:8080/{xtext,xtext-resources,webjars}```
 
+# Rules
+```
+Rule temperature <namespace>
+minTemperature <int>
+maxTemperature <int>
+end
+```
