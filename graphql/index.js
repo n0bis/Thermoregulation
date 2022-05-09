@@ -12,7 +12,7 @@ const typeDefs = gql`
   type Temperature {
     id: ID! @id
     value: Float
-    tracked_at: DateTime
+    tracked_at: Int
     truck: [Truck!]! @relationship(type: "TRACKED_BY", direction: OUT)
   }
 
