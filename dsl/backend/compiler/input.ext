@@ -1,0 +1,4 @@
+Rule temperature test
+minTemperature 16
+maxTemperature 21
+end

@@ -4,7 +4,7 @@
   "description": "Backend for DSL",
   "main": "app.js",
   "scripts": {
-    "start": "./node_modules/nodemon/bin/nodemon.js src/app.js --exec 'npm run lint && node'",
+    "start": "./node_modules/nodemon/bin/nodemon.js src/app.js",
     "lint": "./node_modules/.bin/eslint src/",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

@@ -1,4 +1,4 @@
-Rule temperature test
+Rule temperature apples
 maxTemperature 21
-minTemperature 1
+minTemperature 16
 end
