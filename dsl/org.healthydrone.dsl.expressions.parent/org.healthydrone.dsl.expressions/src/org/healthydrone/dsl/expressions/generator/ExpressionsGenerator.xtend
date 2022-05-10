@@ -24,29 +24,64 @@ override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorCo
 	}
 		
 	def generateMathFile(RulesModel rules, String pkgName, IFileSystemAccess2 fsa) {
-		fsa.generateFile(pkgName + "/" + rules.name + ".py", rules.generatePythonClass(pkgName))
+		fsa.generateFile(pkgName + "/app.py", rules.generatePythonClass(pkgName))
 	}
 	
 	def generatePythonClass (RulesModel rules, String pkgName) '''
 	from neo4j import GraphDatabase
+	from confluent_kafka import Consumer
+	import paho.mqtt.client as mqtt 
 	import os
 	
+	mqttBroker = "tcp://mqtt:1883" 
 	uri = "neo4j://localhost:7687"
 	driver = GraphDatabase.driver(uri, auth=(os.getenv('NEO4J_USER', 'user'), os.getenv('NEO4J_PASSWORD', 'pass')))
-
-
-	«FOR r : rules.rules»
-	«IF r.name == 'minTemperature'» 
-	if «r.name» < «r.value»:
-		print("Too cold!")
-	«ENDIF»
-	«IF r.name == 'maxTemperature'» 
-	if «r.name» > «r.value»:
-		print("Too hot!")
-	«ENDIF»
+	session = driver.session()
+	client = mqtt.Client("rules/alert")
+	client.connect(mqttBroker)
+	
+	consumer = Consumer({
+	    'bootstrap.servers': 'kafka',
+	    'auto.offset.reset': 'latest'
+	})
+	consumer.subscribe(['temperature'])
+	
+	with driver.session() as session:
+		«FOR r : rules.rules»
+		session.run(("CREATE (rule:Rule {nameSpace: '«rules.name»', "
+			«IF r.name == 'minTemperature'» 
+				"min:'«r.value»', "
+			«ENDIF»
+			«IF r.name == 'maxTemperature'» 
+				"max:'«r.value»', "
+			«ENDIF»
+			"max: '«r.value»', "
+			"actions: '«rules.action.name»-«rules.action.value»'}"
+		))
+		«ENDFOR»
 		
+	«FOR r : rules.rules»
+		«r.name» = «r.value»
 	«ENDFOR»
 	
+	while True:
+		msg = consumer.poll(1.0)
+	
+	    if msg is None:
+	        continue
+	    if msg.error():
+	        print("Consumer error: {}".format(msg.error()))
+	        continue
+	
+	    print('Received message: {}'.format(msg.value().decode('utf-8')))
+	    if minTemperature < 0:
+	    	print("Too cold! - publish to mqtt")
+	    elif maxTemperature > 50:
+	    	print("Too hot! - publish to mqtt")
+	    else:
+	    	print("No rule broken move along - publish to mqtt")
+	
+	c.close()
 
 	'''
 }

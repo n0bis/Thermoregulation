@@ -4,7 +4,8 @@ generate expressions "http://www.healthydrone.org/dsl/expressions/Expressions"
 
 RulesModel:
 	'Rule' 'temperature' name=ID
-	rules += Rule* 
+	rules += Rule*
+	action += Action
 	'end'
 ;
 
