@@ -19,7 +19,8 @@ const typeDefs = gql`
   type Rule {
     id: ID! @id
     nameSpace: String
-    conditions: String
+    min: Int
+    max: Int
     actions: String
   }
 `;
