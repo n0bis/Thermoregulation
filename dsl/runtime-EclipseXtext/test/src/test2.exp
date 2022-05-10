@@ -1,6 +1,4 @@
 Rule temperature apples
-maxTemperature 21
-minTemperature 16
-LEDblink RED
-action
+maxTemperature 21 action LEDblink "green" action log "The green LED is blinking."
+minTemperature 1 action LEDblink "red" action log "The blue LED is blinking"
 end

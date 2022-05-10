@@ -7,6 +7,8 @@ import org.eclipse.xtext.validation.Check
 import org.healthydrone.dsl.expressions.expressions.RulesModel
 import org.healthydrone.dsl.expressions.expressions.Rule
 import org.healthydrone.dsl.expressions.expressions.ExpressionsPackage
+import org.healthydrone.dsl.expressions.expressions.Color
+
 /**
  * This class contains custom validation rules. 
  *
@@ -37,5 +39,28 @@ class ExpressionsValidator extends AbstractExpressionsValidator {
 	@Check
 	def checkMinHigherThanMax(Rule rule) {
 		//error("Min value is higher than max", ExpressionsPackage.eINSTANCE.rule_Name, MIN_HIGHER_MAX)
+	}
+	
+	public static final String IS_COLOR = 'is_color'
+	@Check
+	def checkIsColor(Rule rule) {
+		var isTrue = false
+		//error("Min value is higher than max", ExpressionsPackage.eINSTANCE.rule_Name, MIN_HIGHER_MAX)
+		for (r : ((rule.eContainer as RulesModel).rules.filter[name == rule.name])) {
+			for (a : r.actions) {
+				if (a.name == "LEDblink") { //&& !Color.values().contains(a.value)
+					isTrue = false
+					for (c : Color.values()) {
+						if (c.toString == a.value.toString()) {
+							isTrue = true
+						}
+					}
+					if (isTrue == false) {
+						error("LEDblink should contain a color", ExpressionsPackage.eINSTANCE.rule_Name, IS_COLOR)
+					}
+				}
+			}
+		}
+		 
 	}
 }

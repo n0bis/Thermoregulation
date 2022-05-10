@@ -51,10 +51,8 @@ override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorCo
 	«ENDFOR»
 	
 	with driver.session() as session:
-		session.run(("CREATE (rule:Rule {nameSpace: '«rules.name»', "
-			"min: "+ minTemperature +", "
-			"max: "+ maxTemperature +", "
-			"actions: '«rules.action.name»-«rules.action.value»'}"
+		session.run(("CREATE (rule:Rule {nameSpace: '«rules.name»'
+			«FOR rule : rules.rules SEPARATOR "\n"», «rule.name»: «rule.value»«ENDFOR»"
 		))
 		
 	
@@ -70,8 +68,22 @@ override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorCo
 
 		print('Received message: {}'.format(msg.value().decode('utf-8')))
 		if minTemperature < 0:
+			«FOR rule : rules.rules»
+			«IF rule.name == "minTemperature"»
+			«FOR action : rule.actions»
+			print("«action.name»: «action.value.toString()»")
+			«ENDFOR»
+			«ENDIF»
+			«ENDFOR»
 			print("Too cold! - publish to mqtt")
 		elif maxTemperature > 50:
+			«FOR rule : rules.rules»
+			«IF rule.name == "maxTemperature"»
+			«FOR action : rule.actions»
+			print("«action.name»: «action.value.toString()»")
+			«ENDFOR»
+			«ENDIF»
+			«ENDFOR»
 			print("Too hot! - publish to mqtt")
 		else:
 			print("No rule broken move along - publish to mqtt")

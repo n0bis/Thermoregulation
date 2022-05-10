@@ -5,20 +5,20 @@ generate expressions "http://www.healthydrone.org/dsl/expressions/Expressions"
 RulesModel:
 	'Rule' 'temperature' name=ID
 	rules += Rule*
-	action = Action
 	'end'
 ;
 
 Rule:
-	 name=AllowedRules value=INT // 'action' action=Action
+	 name=AllowedRules value=INT (actions+=Action*) // 'action' action=Action
 ;
 
 
 enum Color:
-    RED = 'red' | GREEN = 'green' | BLUE = 'blue';
+    RED = 'red' | GREEN = 'green' | BLUE = 'blue'
+;
 
 Action:
-	 name=AllowedActions value=Color 'action' // actions+=Action*
+	 'action' name=AllowedActions value=STRING  // actions+=Action*
 ;
 
 AllowedActions:
