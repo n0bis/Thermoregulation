@@ -15,6 +15,7 @@ class ESP32_BLE():
         self.ble.irq(self.ble_irq)
         self.register()
         self.advertiser()
+        self.ble.config(rxbuf = 256)
 
     def connected(self):
         global is_ble_connected

@@ -15,9 +15,8 @@ print("----------------------\n\n")
 client_id = ubinascii.hexlify(machine.unique_id())
 
 #Wifi config
-ssid = '' #INSERT WIFI NAME HERE
-password = '' #INSERT WIFI PASSWORD HERE
-
+ssid = "ENTER SSID HERE"
+password = "ENTER PASSWORD HERE"
 #Setup Wifi connection
 station = network.WLAN(network.STA_IF)
 station.active(True)
@@ -39,12 +38,16 @@ def connectWifi():
 connectWifi()
 
 count = 0
+total = 0
 while not station.isconnected():
     if count == 5:
         count = 0
         connectWifi()
+    if total == 60:
+        break
     
     count += 1
+    total += 1
     time.sleep(1)
     
 print("Device connected to network: %s" %(ssid))

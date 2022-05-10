@@ -15,6 +15,7 @@ class ESP32_BLE():
         self.ble.irq(self.ble_irq)
         self.register()
         self.advertiser()
+        self.ble.config(rxbuf = 256)
 
     def connected(self):
         global is_ble_connected
@@ -42,7 +43,7 @@ class ESP32_BLE():
                          # A client has written to this characteristic or descriptor.          
             buffer = self.ble.gatts_read(self.rx)
             ble_msg = buffer.decode('UTF-8').strip()
-            
+
     def register(self):        
         # Nordic UART Service (NUS)
         NUS_UUID = '6E400001-B5A3-F393-E0A9-E50E24DCCA9E'

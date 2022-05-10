@@ -1,67 +1,94 @@
-from machine import Pin
-import dht
+from machine import Pin, RTC
 from utime import sleep_ms, ticks_ms
 from BluetoothBroadcaster import ESP32_BLE
+from math import ceil
+import time
+import dht
+import gc
+
+gc.collect()
 
 # Update timings (Interval to send data is avg_count * sample_interval)
 sample_interval = 1  # Interval in which to sample the temperature !Should not be lower than 1!
 avg_count = 5      # How many samples to average before sending
 
-
 # Temperature Sensors
-t1 = dht.DHT11(Pin(32, Pin.IN))
-t2 = dht.DHT11(Pin(33, Pin.IN))
-t3 = dht.DHT11(Pin(26, Pin.IN))
-t4 = dht.DHT11(Pin(27, Pin.IN))
-sensors = [t1, t2, t3, t4]
-temp1 = 0
-temp2 = 0
-temp3 = 0
-temp4 = 0
-temps = [temp1, temp2, temp3, temp4]
+t1 = dht.DHT11(Pin(27, Pin.IN))
+temp1 = []
 
 # Setup Bluetooth
 bt_bc = ESP32_BLE("ESP32BLE_reciever")
 bt_bc.scanForReciever()
 
+# Storage in case of connection errors
+temp_store = []
 
-def resetTemps():
-    for i in range(0,4):
-        temps[i] = 0
+def freeMem():
+    f = gc.mem_free()
+    a = gc.mem_alloc()
+    t = f+a
+    return (f/t * 100)
 
+def send_data(msg):
+    print("sending message: %s" %(msg))
+    try:
+        bt_bc.sendMsg(msg)
+    except OSError as e:
+        bt_bc.disconnect()
+        print("Connection lost")
 
-count = 0
+def send_stored_data():
+    for d in temp_store:
+        msg = create_msg(d)
+        send_data(msg)
+        sleep_ms(1000)
+    temp_store.clear()
+        
 
-sleep_ms(5000)
+def create_msg(temps):
+    return "%s;%s;" %(temps[0], temps[1])
+    
+
+sample_count = 0
+sleep_ms(2000)
+
 # Main Loop
 while True:
     sleep_ms(sample_interval*1000)
-    for i in range(0,4):
-        sensors[i].measure()
-        temps[i] = temps[i] + sensors[i].temperature()
-    count += 1
     
-    print(count)
-    if count == avg_count:
-        avg_temp1 = temps[0] / avg_count
-        avg_temp2 = temps[1] / avg_count
-        avg_temp3 = temps[2] / avg_count
-        avg_temp4 = temps[3] / avg_count
-        resetTemps()
+    t1.measure()
+    temp1.append(t1.temperature())
+    sample_count += 1
+    
+    print(sample_count)
+    
+    if sample_count == avg_count:
+        timestamp = time.time()
+        print(timestamp)
+        avg_temp = (sum(temp1)/ avg_count)
+        temp1.clear()
+        
+        current_temp = [timestamp, avg_temp]
         
         if bt_bc.isConnected():
-            msg = ("%s;%s;%s;%s" %(avg_temp1, avg_temp2, avg_temp3, avg_temp4))
-            print("sending message: %s" %(msg))
-            try:
-                bt_bc.sendMsg(msg)
-            except OSError as e:
-                bt_bc.disconnect()
-                print("Connection lost")
+            if len(temp_store) > 0:
+                send_stored_data()
+            msg = create_msg(current_temp)
+            send_data(msg)
+            
         else:
+            print(freeMem())
+            if freeMem() < 30:
+                temp_store = temp_store[2-1::2] #Delete every 2nd stored temperature set to make room for new data (decreases resolution)
+                gc.collect()
+                
+                
+            temp_store.append(current_temp)
+                
             try:
                 bt_bc.scanForReciever()
             except OSError as e:
                 print("scanning for bluetooth device")
             
-        count = 0
+        sample_count = 0
         
