@@ -1,4 +1,6 @@
 Rule temperature apples
 maxTemperature 21
 minTemperature 16
+LEDblink RED
+action
 end

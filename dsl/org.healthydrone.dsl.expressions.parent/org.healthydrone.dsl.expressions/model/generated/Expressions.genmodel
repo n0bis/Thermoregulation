@@ -6,6 +6,11 @@
     complianceLevel="8.0" copyrightFields="false" runtimeVersion="2.20">
   <genPackages prefix="Expressions" basePackage="org.healthydrone.dsl.expressions"
       disposableProviderFactory="true" fileExtensions="exp" ecorePackage="Expressions.ecore#/">
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="Expressions.ecore#//Color">
+      <genEnumLiterals ecoreEnumLiteral="Expressions.ecore#//Color/RED"/>
+      <genEnumLiterals ecoreEnumLiteral="Expressions.ecore#//Color/GREEN"/>
+      <genEnumLiterals ecoreEnumLiteral="Expressions.ecore#//Color/BLUE"/>
+    </genEnums>
     <genClasses ecoreClass="Expressions.ecore#//RulesModel">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Expressions.ecore#//RulesModel/name"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Expressions.ecore#//RulesModel/rules"/>
@@ -18,7 +23,6 @@
     <genClasses ecoreClass="Expressions.ecore#//Action">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Expressions.ecore#//Action/name"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Expressions.ecore#//Action/value"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Expressions.ecore#//Action/actions"/>
     </genClasses>
   </genPackages>
 </genmodel:GenModel>
