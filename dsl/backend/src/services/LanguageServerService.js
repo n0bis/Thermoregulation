@@ -8,7 +8,7 @@ module.exports = {
     return new Promise(function (resolve, reject) {
       const baseDir = path.dirname(path.resolve(languagePath))
       try {
-        const ls = spawn(`java --add-opens java.base/java.lang=ALL-UNNAMED -jar ${languagePath}`, {
+        const ls = spawn(`java -jar ${languagePath}`, {
           shell: true,
           cwd: baseDir
         })

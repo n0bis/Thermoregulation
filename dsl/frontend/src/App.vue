@@ -41,7 +41,7 @@ export default {
     setXtextEditor () {
       /* The serviceUrl contains the URL, on which
          the language server is reachable */
-      this.dslFileExtension = window._dslFileExtension
+      this.dslFileExtension = 'exp'
 
       /* We have to wait until rendering of this.dslFileExtension
         in data-editor-xtext-lang attribute finishes
