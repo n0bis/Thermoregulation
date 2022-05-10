@@ -46,40 +46,35 @@ override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorCo
 	})
 	consumer.subscribe(['temperature'])
 	
-	with driver.session() as session:
-		«FOR r : rules.rules»
-		session.run(("CREATE (rule:Rule {nameSpace: '«rules.name»', "
-			«IF r.name == 'minTemperature'» 
-				"min:'«r.value»', "
-			«ENDIF»
-			«IF r.name == 'maxTemperature'» 
-				"max:'«r.value»', "
-			«ENDIF»
-			"max: '«r.value»', "
-			"actions: '«rules.action.name»-«rules.action.value»'}"
-		))
-		«ENDFOR»
-		
 	«FOR r : rules.rules»
 		«r.name» = «r.value»
 	«ENDFOR»
 	
+	with driver.session() as session:
+		session.run(("CREATE (rule:Rule {nameSpace: '«rules.name»', "
+			"min: "+ minTemperature +", "
+			"max: "+ maxTemperature +", "
+			"actions: '«rules.action.name»-«rules.action.value»'}"
+		))
+		
+	
+	
 	while True:
 		msg = consumer.poll(1.0)
 	
-	    if msg is None:
-	        continue
-	    if msg.error():
-	        print("Consumer error: {}".format(msg.error()))
-	        continue
-	
-	    print('Received message: {}'.format(msg.value().decode('utf-8')))
-	    if minTemperature < 0:
-	    	print("Too cold! - publish to mqtt")
-	    elif maxTemperature > 50:
-	    	print("Too hot! - publish to mqtt")
-	    else:
-	    	print("No rule broken move along - publish to mqtt")
+		if msg is None:
+			continue
+		if msg.error():
+			print("Consumer error: {}".format(msg.error()))
+			continue
+
+		print('Received message: {}'.format(msg.value().decode('utf-8')))
+		if minTemperature < 0:
+			print("Too cold! - publish to mqtt")
+		elif maxTemperature > 50:
+			print("Too hot! - publish to mqtt")
+		else:
+			print("No rule broken move along - publish to mqtt")
 	
 	c.close()
 
