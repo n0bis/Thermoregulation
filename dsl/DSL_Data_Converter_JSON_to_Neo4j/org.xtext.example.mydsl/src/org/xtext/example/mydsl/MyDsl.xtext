@@ -1,0 +1,9 @@
+grammar org.xtext.example.mydsl.MyDsl with org.eclipse.xtext.common.Terminals
+
+generate myDsl "http://www.xtext.org/example/mydsl/MyDsl"
+
+Model:
+	datas+=data*;
+	
+data:
+	'"{""tracked_at"":' tracked=INT ',""value"":' value=INT '}"';
