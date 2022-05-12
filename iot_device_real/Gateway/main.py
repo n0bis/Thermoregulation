@@ -59,12 +59,13 @@ def connect_mqtt():
 def update_screen(timestamp, temp):
     date = time.localtime(timestamp)[3:5]
     date_str = "{:02} : {:02}".format(date[0], date[1])
+    temp_str = "Temperature: {}".format(temp)
     
     oled.fill(0)
     
     oled.text(str(date_str), 64, 0)
     oled.hline(0, 8, 128, 1)
-    oled.text(temp, 0, 15)
+    oled.text(temp_str, 0, 15)
     
     oled.show()
     
