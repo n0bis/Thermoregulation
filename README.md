@@ -7,5 +7,13 @@ test to populate new data (navigate to iot-device folder):
 
 watch in neo4j browser
 
-# Data
-data format might change 
+# Dashboards - Backend
+
+## Neo4j
+```http://localhost:7474/browser/```
+
+## GraphQL
+```http://localhost:4000```
+
+## KOWL
+```http://localhost:8088```

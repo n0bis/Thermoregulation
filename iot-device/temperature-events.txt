@@ -1,1 +1,1 @@
-{"value": 6.5, timestamp: 1652099835}
+ {"value": 0, "timestamp": 1652347395}
