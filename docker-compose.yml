@@ -117,6 +117,18 @@ services:
     networks:
       - network1
 
+  frontend:
+    build:
+      context: ./frontend
+    hostname: frontend
+    container_name: frontend
+    ports:
+      - 3000:3000
+    depends_on:
+      - graphql
+    networks:
+      - network1
+
 networks:
   network1:
     driver: bridge
