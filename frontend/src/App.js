@@ -1,23 +1,50 @@
 import "./App.css";
 import { ResponsiveLine } from "@nivo/line";
+import { useEffect, useState } from "react";
 
 function App() {
+  const [data, setData] = useState([]);
+
   useEffect(() => {
     getData();
-  });
+  }, []);
 
   function getData() {
-    fetch("http://localhost:4000/")
+    fetch("http://localhost:4000", {
+      body: '{"query":"query ExampleQuery {temperatures {value tracked_at} trucks {name}}"}',
+      headers: {
+        "Content-Type": "application/json",
+      },
+      method: "POST",
+    })
       .then((response) => response.json())
-      .then((data) => console.log(data));
+      .then((response) => {
+        console.log(response.data.temperatures);
+        const { data } = response;
+        const { temperatures } = data;
+
+        setData([
+          {
+            id: "Temperature",
+            color: "hsl(84, 70%, 50%)",
+            data: dataConverter(temperatures),
+          },
+        ]);
+
+        console.log(temperatures);
+      });
   }
+
+  useEffect(() => {
+    //console.log(data);
+  }, [data]);
 
   return (
     <div className="page">
       <div className="sidebar">
         <ul>
           <li className="active">
-            <a href="#">Dashboard</a>
+            <a href="#">Dashbsoard</a>
           </li>
           <li>
             <a href="#">Rules manager</a>
@@ -34,13 +61,27 @@ function App() {
         <div className="content">
           <div className="container">
             <div className="chart">
-              <MyResponsiveLine data={data} />
+              {data.length !== 0 && <MyResponsiveLine data={data} />}
             </div>
           </div>
         </div>
       </div>
     </div>
   );
+}
+
+function dataConverter(data) {
+  var convertedData = [];
+  console.log(data);
+
+  data.forEach((element) => {
+    convertedData.push({
+      x: element.tracked_at,
+      y: element.value,
+    });
+  });
+
+  return convertedData;
 }
 
 const MyResponsiveLine = ({ data /* see data tab */ }) => (
@@ -112,7 +153,7 @@ const MyResponsiveLine = ({ data /* see data tab */ }) => (
   />
 );
 
-const data = [
+const staticData = [
   {
     id: "Temperature",
     color: "hsl(84, 70%, 50%)",
@@ -214,3 +255,10 @@ const data = [
 ];
 
 export default App;
+
+/*
+curl --request POST \
+    --header 'content-type: application/json' \
+    --url http://localhost:4000 \
+    --data '{"query":"query ExampleQuery {\n  temperatures {\n    value\n    tracked_at\n  }\n  trucks {\n    name\n  }\n}"}'
+*/
