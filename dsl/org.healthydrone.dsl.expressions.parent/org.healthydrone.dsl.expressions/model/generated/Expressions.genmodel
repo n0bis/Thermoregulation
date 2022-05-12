@@ -14,11 +14,11 @@
     <genClasses ecoreClass="Expressions.ecore#//RulesModel">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Expressions.ecore#//RulesModel/name"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Expressions.ecore#//RulesModel/rules"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Expressions.ecore#//RulesModel/action"/>
     </genClasses>
     <genClasses ecoreClass="Expressions.ecore#//Rule">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Expressions.ecore#//Rule/name"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Expressions.ecore#//Rule/value"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Expressions.ecore#//Rule/actions"/>
     </genClasses>
     <genClasses ecoreClass="Expressions.ecore#//Action">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Expressions.ecore#//Action/name"/>

@@ -32,16 +32,17 @@ override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorCo
 	from confluent_kafka import Consumer
 	import paho.mqtt.client as mqtt 
 	import os
+	import json
 	
-	mqttBroker = "tcp://mqtt:1883" 
 	uri = "neo4j://localhost:7687"
-	driver = GraphDatabase.driver(uri, auth=(os.getenv('NEO4J_USER', 'user'), os.getenv('NEO4J_PASSWORD', 'pass')))
+	driver = GraphDatabase.driver(uri, auth=(os.getenv('NEO4J_USER', 'neo4j'), os.getenv('NEO4J_PASSWORD', '2cool4school')))
 	session = driver.session()
-	client = mqtt.Client("rules/alert")
-	client.connect(mqttBroker)
+	client = mqtt.Client("rules_engine")
+	client.connect("localhost", 1883, 60) 
 	
 	consumer = Consumer({
-	    'bootstrap.servers': 'kafka',
+		'group.id': 'foo',
+	    'bootstrap.servers': 'localhost',
 	    'auto.offset.reset': 'latest'
 	})
 	consumer.subscribe(['temperature'])
@@ -51,12 +52,12 @@ override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorCo
 	«ENDFOR»
 	
 	with driver.session() as session:
-		session.run(("CREATE (rule:Rule {nameSpace: '«rules.name»'
-			«FOR rule : rules.rules SEPARATOR "\n"», «rule.name»: «rule.value»«ENDFOR»"
+		session.run(("CREATE (rule:Rule {nameSpace: '«rules.name»', "
+			"min: "+ str(minTemperature) +", "
+			"max: "+ str(maxTemperature) + "})"
 		))
-		
 	
-	
+	hasRuleBeenBroken = False # Make state machine
 	while True:
 		msg = consumer.poll(1.0)
 	
@@ -65,28 +66,36 @@ override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorCo
 		if msg.error():
 			print("Consumer error: {}".format(msg.error()))
 			continue
-
-		print('Received message: {}'.format(msg.value().decode('utf-8')))
-		if minTemperature < 0:
-			«FOR rule : rules.rules»
-			«IF rule.name == "minTemperature"»
-			«FOR action : rule.actions»
-			print("«action.name»: «action.value.toString()»")
-			«ENDFOR»
-			«ENDIF»
-			«ENDFOR»
-			print("Too cold! - publish to mqtt")
-		elif maxTemperature > 50:
-			«FOR rule : rules.rules»
-			«IF rule.name == "maxTemperature"»
-			«FOR action : rule.actions»
-			print("«action.name»: «action.value.toString()»")
-			«ENDFOR»
-			«ENDIF»
-			«ENDFOR»
-			print("Too hot! - publish to mqtt")
-		else:
-			print("No rule broken move along - publish to mqtt")
+		
+		try:
+			print('Received message: {}'.format(msg.value().decode('utf-8')))
+			event = json.loads(msg.value().decode('utf-8'))
+			if minTemperature > event["value"] and not hasRuleBeenBroken:
+				«FOR rule : rules.rules»
+				«IF rule.name == "minTemperature"»
+				«FOR action : rule.actions»
+				client.publish("rules/alert", "«action.name»: «action.value.toString()»")
+				«ENDFOR»
+				«ENDIF»
+				«ENDFOR»
+				print("Too cold! - publish to mqtt")
+				hasRuleBeenBroken = True
+			elif maxTemperature < event["value"] and not hasRuleBeenBroken:
+				«FOR rule : rules.rules»
+				«IF rule.name == "maxTemperature"»
+				«FOR action : rule.actions»
+				client.publish("rules/alert", "«action.name»: «action.value.toString()»")
+				«ENDFOR»
+				«ENDIF»
+				«ENDFOR»
+				print("Too hot! - publish to mqtt")
+				hasRuleBeenBroken = True
+			else:
+				print("No rule broken move along - publish to mqtt")
+				client.publish("rules/alert", "")
+		except Exception as err:
+			print(err)
+			continue
 	
 	c.close()
 

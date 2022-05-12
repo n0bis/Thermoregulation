@@ -8,7 +8,7 @@ Right click the ```org.healthydrone.dsl-expressions.web``` run as ```Java Applic
 # Rules
 ```
 Rule temperature <namespace>
-minTemperature <int>
-maxTemperature <int>
+minTemperature <int> action LEDblink <red> | <green> | <blue>
+maxTemperature <int> action LEDblink <red> | <green> | <blue>
 end
 ```
