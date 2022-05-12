@@ -2,6 +2,16 @@ import "./App.css";
 import { ResponsiveLine } from "@nivo/line";
 
 function App() {
+  useEffect(() => {
+    getData();
+  });
+
+  function getData() {
+    fetch("http://localhost:4000/")
+      .then((response) => response.json())
+      .then((data) => console.log(data));
+  }
+
   return (
     <div className="page">
       <div className="sidebar">
