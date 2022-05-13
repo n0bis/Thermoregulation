@@ -43,10 +43,10 @@ while True:
 		print('Received message: {}'.format(msg.value().decode('utf-8')))
 		event = json.loads(msg.value().decode('utf-8'))
 		if minTemperature > event["value"]:
-			client.publish("rules/alert", "LEDblink: red")
+			client.publish("rules/alert", "LEDblink: blue")
 			print("Too cold! - publish to mqtt")
 		elif maxTemperature < event["value"]:
-			client.publish("rules/alert", "LEDblink: green")
+			client.publish("rules/alert", "LEDblink: red")
 			print("Too hot! - publish to mqtt")
 		else:
 			print("No rule broken move along - publish to mqtt")
