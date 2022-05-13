@@ -96,6 +96,8 @@ const MyResponsiveLine = ({ data /* see data tab */ }) => (
       stacked: true,
       reverse: false,
     }}
+    minValue={-40}
+    maxValue={40}
     yFormat=" >-.2f"
     curve="cardinal"
     axisTop={null}
