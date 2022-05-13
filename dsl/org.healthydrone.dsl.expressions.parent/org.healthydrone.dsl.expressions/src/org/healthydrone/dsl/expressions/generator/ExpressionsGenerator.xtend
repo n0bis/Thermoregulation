@@ -42,7 +42,7 @@ override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorCo
 	client = mqtt.Client("rules_engine")
 	client.on_connect = on_connect
 	client.connect("localhost", 1884, 60)
-	client.loop_forever()
+	client.loop_start()
 	
 	consumer = Consumer({
 		'group.id': 'foo',
