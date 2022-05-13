@@ -131,12 +131,14 @@ services:
 
   mosquitto:
     image: eclipse-mosquitto
-    volumes:
-      - ./:/mosquitto/:rw
     hostname: mosquitto
     container_name: mosquitto
+    volumes:
+      - ./mosquitto/config:/mosquitto/config/
     ports:
-      - 1884:1883
+      - 1884:1884
+    networks:
+      - network1
 
 networks:
   network1:
