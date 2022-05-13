@@ -129,6 +129,15 @@ services:
     networks:
       - network1
 
+  mosquitto:
+    image: eclipse-mosquitto
+    volumes:
+      - ./:/mosquitto/:rw
+    hostname: mosquitto
+    container_name: mosquitto
+    ports:
+      - 1884:1883
+
 networks:
   network1:
     driver: bridge
