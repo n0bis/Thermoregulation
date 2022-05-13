@@ -7,6 +7,9 @@ function App() {
 
   useEffect(() => {
     getData();
+    var intervalId = window.setInterval(function () {
+      getData();
+    }, 5000);
   }, []);
 
   function getData() {
