@@ -26,7 +26,6 @@ with driver.session() as session:
 		"max: "+ str(maxTemperature) + "})"
 	))
 
-hasRuleBeenBroken = False # Make state machine
 while True:
 	msg = consumer.poll(1.0)
 
@@ -39,14 +38,12 @@ while True:
 	try:
 		print('Received message: {}'.format(msg.value().decode('utf-8')))
 		event = json.loads(msg.value().decode('utf-8'))
-		if minTemperature > event["value"] and not hasRuleBeenBroken:
+		if minTemperature > event["value"]:
 			client.publish("rules/alert", "LEDblink: red")
 			print("Too cold! - publish to mqtt")
-			hasRuleBeenBroken = True
-		elif maxTemperature < event["value"] and not hasRuleBeenBroken:
+		elif maxTemperature < event["value"]:
 			client.publish("rules/alert", "LEDblink: green")
 			print("Too hot! - publish to mqtt")
-			hasRuleBeenBroken = True
 		else:
 			print("No rule broken move along - publish to mqtt")
 			client.publish("rules/alert", "")
