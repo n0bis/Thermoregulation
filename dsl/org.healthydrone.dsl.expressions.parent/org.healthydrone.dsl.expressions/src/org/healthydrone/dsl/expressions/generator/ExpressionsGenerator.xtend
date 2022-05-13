@@ -41,7 +41,7 @@ override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorCo
 	    print(f"Connected with result code {rc}")
 	client = mqtt.Client("rules_engine")
 	client.on_connect = on_connect
-	client.connect("localhost", 1883, 60)
+	client.connect("localhost", 1884, 60)
 	client.loop_forever()
 	
 	consumer = Consumer({
