@@ -7,8 +7,12 @@ import json
 uri = "neo4j://localhost:7687"
 driver = GraphDatabase.driver(uri, auth=(os.getenv('NEO4J_USER', 'neo4j'), os.getenv('NEO4J_PASSWORD', '2cool4school')))
 session = driver.session()
+def on_connect(client, userdata, flags, rc):
+    print(f"Connected with result code {rc}")
 client = mqtt.Client("rules_engine")
-client.connect("localhost", 1883, 60) 
+client.on_connect = on_connect
+client.connect("localhost", 1883, 60)
+client.loop_forever()
 
 consumer = Consumer({
 	'group.id': 'foo',
