@@ -66,6 +66,7 @@ function App() {
             <div className="chart">
               {data.length !== 0 && <MyResponsiveLine data={data} />}
             </div>
+            <AlertList />
           </div>
         </div>
       </div>
@@ -86,6 +87,35 @@ function dataConverter(data) {
 
   return convertedData;
 }
+
+const AlertList = () => {
+  const [alerts, setAlerts] = useState([]);
+
+  useEffect(() => {
+    setAlerts([
+      {
+        msg: "asdas",
+      },
+    ]);
+  }, []);
+
+  return (
+    <div className="alert-box">
+      <h4>Incomming alerts</h4>
+      {alerts.length !== 0 ? (
+        <ul>
+          {alerts.map((item) => (
+            <li>
+              <p>{item.msg}</p>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <div className="alert-info">No alerts found.</div>
+      )}
+    </div>
+  );
+};
 
 const MyResponsiveLine = ({ data /* see data tab */ }) => (
   <ResponsiveLine
