@@ -15,8 +15,9 @@ print("----------------------\n\n")
 client_id = ubinascii.hexlify(machine.unique_id())
 
 #Wifi config
-ssid = "ENTER SSID HERE"
-password = "ENTER PASSWORD HERE"
+ssid = 'PatricksWifi'
+password = '123456778'
+
 #Setup Wifi connection
 station = network.WLAN(network.STA_IF)
 station.active(True)

@@ -1,7 +1,7 @@
 from machine import Pin, ADC, SoftI2C
 from utime import sleep_ms, ticks_ms
-from umqttsimple import MQTTClient
 from BluetoothReciever import ESP32_BLE
+from simple import MQTTClient
 import time
 import network
 import ssd1306
@@ -17,9 +17,13 @@ blue = Pin(26, Pin.OUT)
 blink_freq = 1 # time the led should stay on and off during blinking in seconds
 blink_active = False
 
-on = True
+r_on = False
+g_on = False
+b_on = False
+toggle_on = False
+
 red.on()
-green.on()
+green.off()
 blue.on()
 
 #OLED Setup
@@ -34,9 +38,12 @@ time_fix = 946678200
 
 #MQTT config
 client_id = ubinascii.hexlify(machine.unique_id())
-mqtt_server = "ENTER MQTT IP HERE"
-topic_pub_temp = b'test'
-top_sub_action = b'actions'
+mqtt_server = '192.168.1.179'
+mqtt_port_send = '1883'
+mqtt_port_recieve = '1884'
+
+topic_pub_temp = b'TEMPERATURE'
+top_sub_action = b'rules/alert'
 
 #message timing
 last_message = 0
@@ -46,73 +53,116 @@ message_interval = 0.5 #in seconds
 ble_msg = ""
 mqtt_msg = ""
 
-
-def connect_mqtt():
-    global client_id, mqtt_server
-    client = MQTTClient(client_id, mqtt_server)
-    client.connect()
-    print('Connected to %s MQTT broker' % (mqtt_server))
+def connect_mqtt(server, port, sub=False):
+    global client_id
+    
+    client = MQTTClient(client_id, server, port, keepalive=9999)
     client.set_callback(recieve_msg)
-    client.subscribe(top_sub_action)
+    client.connect()
+    print('Connected to %s:%s MQTT broker' % (server, port))
+    
+    if sub:
+        client.subscribe(top_sub_action,qos=0)
+        
     return client
 
+# Updates the screen with the newest Time and Temperature data
 def update_screen(timestamp, temp):
     date = time.localtime(timestamp)[3:5]
     date_str = "{:02} : {:02}".format(date[0], date[1])
-    temp_str = "Temperature: {}".format(temp)
+    temp_str = "{}C".format(temp)
     
     oled.fill(0)
     
     oled.text(str(date_str), 64, 0)
     oled.hline(0, 8, 128, 1)
-    oled.text(temp_str, 0, 15)
+    oled.text("Temperature:", 0, 20)
+    oled.text(temp_str, 0, 30)
     
     oled.show()
-    
-def recieve_msg(topic, msg):
-    mqtt_msg = msg.decode('UTF-8')
-    print(mqtt_msg)
-    x = json.loads(mqtt_msg)
-    do_action(x["actions"])
 
+# Callback method for incoming mqtt messages
+def recieve_msg(topic, msg):
+    try: 
+        mqtt_msg = msg.decode('UTF-8') 
+        print("message: %s" %(mqtt_msg))
+        action = mqtt_msg.split(":")
+        do_action(action[1].strip())
+    except Exception as e:
+        print("unexpected message recieved: %s" %(mqtt_msg))
+    
+    
+# Handles the incoming action from the rules engine
 def do_action(action):
-    global blink_active
-    if action == "blink":
-        blink_active = True
-    else:
-        blink_active = False
-            
+    global r_on, g_on, b_on
+    
+    if action == "stop":
+        red.on()
+        green.off()
+        blue.on()
+        r_on = False
+        g_on = False
+        b_on = False 
+    elif action == "red":
+        r_on = True
+        g_on = False
+        b_on = False
+    elif action == "green":
+        r_on = False
+        g_on = True
+        b_on = False
+    elif action == "blue":
+        r_on = False
+        g_on = False
+        b_on = True
+
+# Toggles the LED to make it flash
 def toggle_led():
-    global on
-    if on:
-        red.off()
-        on = False
+    global r_on, g_on, b_on, toggle_on
+    if toggle_on:
+        if r_on:
+            red.off()
+        if g_on:
+            green.off()
+        if b_on:
+            blue.off() 
     else:
         red.on()
-        on = True
-    
+        green.on()
+        blue.on()
+        
+    toggle_on = not toggle_on
 
+
+client_send = None
+client_recieve = None
 # Connect to MQTT
 try:
-    client = connect_mqtt()
+    client_send = connect_mqtt(mqtt_server, mqtt_port_send)
 except OSError as e:
-    client = None
+    client_send = None
+    print("offline mode")
+    
+try:
+    client_recieve = connect_mqtt(mqtt_server, mqtt_port_recieve, True)
+except OSError as e:
+    client_send = None
     print("offline mode")
     
 # Setup Bluetooth Connection
 bt_reciever = ESP32_BLE("ESP32BLE_reciever")
 
 
+# Timers to create non-blocking sleep
 message_timer = time.ticks_ms()
 blink_timer = time.ticks_ms()
+
 # Main Loop
 while True:
     current_time = time.ticks_ms()
-    
-    if blink_active:
-        if time.ticks_diff(current_time, blink_timer) > blink_freq*1000:
+    if r_on or g_on or b_on:
+        if time.ticks_diff(current_time, blink_timer) > blink_freq*1000: #Toggles the LED according to blink frequency
             blink_timer = time.ticks_ms()
-            print("toggle")
             toggle_led()
         
     
@@ -125,8 +175,8 @@ while True:
                 msg = ""
                 bt_reciever.resetMessage()
             
-            if client is not None:
-                client.check_msg()
+            if client_recieve is not None:
+                client_recieve.check_msg()
                 
             if msg != "":
                 
@@ -140,9 +190,8 @@ while True:
 
                 update_screen(timestamp_small, temperature)
                 
-                json_temp = '''{"value":%s, timestamp: %s}''' %(temperature, timestamp)
+                json_temp = '{"value":%s, "timestamp": %s}' %(temperature, timestamp)
                 
-                if client is not None:
-                    client.publish(topic_pub_temp, json_temp)
-        
-    
+                if client_send is not None:
+                    print("sending data to mqtt")
+                    client_send.publish(topic_pub_temp, json_temp)
