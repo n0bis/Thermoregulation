@@ -72,6 +72,7 @@ body {
   padding:20px;
 }
 .chart {
+  position: relative;
   padding:30px 20px;
   margin-top:-50px;
   background-color: #FFF;
@@ -80,4 +81,32 @@ body {
   box-shadow: 0px 0px 25px -12px rgba(0,0,0,0.75);
   border-radius: 10px;
   height: 400px;
+  margin-bottom: 20px;;
+}
+
+.red-line {
+  position: absolute;
+}
+
+.alert-box {
+  padding:30px 20px;
+  background-color: #FFF;
+  -webkit-box-shadow: 0px 0px 25px -12px rgba(0,0,0,0.75);
+  -moz-box-shadow: 0px 0px 25px -12px rgba(0,0,0,0.75);
+  box-shadow: 0px 0px 25px -12px rgba(0,0,0,0.75);
+  border-radius: 10px;
+}
+.alert-box ul {
+  list-style-type: none;
+  padding:0;
+  margin:0;
+}
+.alert-box ul li {
+  padding:15px 15px;
+  border-radius: 3px;
+  background-color: #f44336;
+  color: white;
+}
+.alert-box ul li p {
+  margin:0;
 }
