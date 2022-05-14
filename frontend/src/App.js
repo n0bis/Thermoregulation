@@ -1,14 +1,21 @@
 import "./App.css";
 import { ResponsiveLine } from "@nivo/line";
 import { useEffect, useState } from "react";
+import mqtt from "precompiled-mqtt";
+
+// mosquitto test broker
+const URL = "mqtt://localhost:1884";
+
+const client = mqtt.connect(URL);
 
 function App() {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    getData();
+    //getData();
+    getAlerts();
     var intervalId = window.setInterval(function () {
-      getData();
+      //getData();
     }, 5000);
   }, []);
 
@@ -38,6 +45,26 @@ function App() {
       });
   }
 
+  function getAlerts() {
+    client.on("connect", () => {
+      console.log("CONNECTED to broker");
+    });
+
+    client.on("connect", function () {
+      client.subscribe("test", function (err) {
+        if (!err) {
+          client.publish("test", "Hello mqtt");
+        }
+      });
+    });
+
+    client.on("message", function (topic, message) {
+      // message is Buffer
+      console.log(message.toString());
+      client.end();
+    });
+  }
+
   useEffect(() => {
     //console.log(data);
   }, [data]);
@@ -64,7 +91,9 @@ function App() {
         <div className="content">
           <div className="container">
             <div className="chart">
+              <div className="red-line" />
               {data.length !== 0 && <MyResponsiveLine data={data} />}
+              <div className="blue-line" />
             </div>
             <AlertList />
           </div>
@@ -94,7 +123,7 @@ const AlertList = () => {
   useEffect(() => {
     setAlerts([
       {
-        msg: "asdas",
+        msg: "Rules broken: too many degrees?",
       },
     ]);
   }, []);
