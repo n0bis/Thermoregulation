@@ -50,7 +50,9 @@ services:
       KAFKA_MQTT_TOPIC_REGEX_LIST: temperature:.*TEMPERATURE
 
   neo4j:
-    image: neo4j:${NEO4J_VER}
+    build:
+      context: ./neo4j
+    #image: neo4j:${NEO4J_VER}
     hostname: neo4j
     container_name: neo4j
     ports:
