@@ -141,7 +141,7 @@ const AlertList = () => {
       {alerts.length !== 0 ? (
         <ul>
           {alerts.map((item) => {
-            const response = item.message.split(" ");
+            const response = item.msg.split(" ");
             const color = response[1];
             if (response[0] !== "undefined") {
               if (color === "blue") {
