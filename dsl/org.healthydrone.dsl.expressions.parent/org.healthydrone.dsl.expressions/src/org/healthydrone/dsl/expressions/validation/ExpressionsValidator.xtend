@@ -38,7 +38,18 @@ class ExpressionsValidator extends AbstractExpressionsValidator {
 	
 	@Check
 	def checkMinHigherThanMax(Rule rule) {
-		//error("Min value is higher than max", ExpressionsPackage.eINSTANCE.rule_Name, MIN_HIGHER_MAX)
+		//
+		val min = (rule.eContainer as RulesModel).rules.filter[name == "minTemperature"]
+		val max = (rule.eContainer as RulesModel).rules.filter[name == "maxTemperature"]
+		
+		try {
+			if (min.get(0).value > max.get(0).value) {
+				error("Min value is higher than max", ExpressionsPackage.eINSTANCE.rule_Name, MIN_HIGHER_MAX)
+			}
+		} catch (Exception e) {
+			
+		}
+
 	}
 	
 	public static final String IS_COLOR = 'is_color'

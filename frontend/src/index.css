@@ -84,8 +84,19 @@ body {
   margin-bottom: 20px;;
 }
 
+.blue-line {
+  position: absolute;
+  width: calc(100% - 40px);
+  height: 2px;
+  bottom:150px;
+  background-color: blue;
+}
 .red-line {
   position: absolute;
+  width: calc(100% - 40px);
+  height: 2px;
+  top:150px;
+  background-color: #f44336;
 }
 
 .alert-box {

@@ -22,7 +22,7 @@ consumer = Consumer({
 consumer.subscribe(['temperature'])
 
 maxTemperature = 21
-minTemperature = 1
+minTemperature = -5
 
 with driver.session() as session:
 	session.run(("CREATE (rule:Rule {nameSpace: 'apples', "
