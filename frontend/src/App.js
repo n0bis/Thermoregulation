@@ -15,7 +15,7 @@ function App() {
     getData();
     //getAlerts();
     var intervalId = window.setInterval(function () {
-      //getData();
+      getData();
     }, 5000);
   }, []);
 
@@ -101,6 +101,7 @@ const AlertList = () => {
   const [alerts, setAlerts] = useState([]);
 
   useEffect(() => {
+    getAlerts();
     //setAlerts([{ message: "LEDblink: blue", timestamp: "shiusasa" }]);
   }, []);
 
@@ -113,7 +114,7 @@ const AlertList = () => {
       client.on("connect", function () {
         client.subscribe("rules/alert", function (err) {
           if (!err) {
-            //client.publish("test", "Hello mqtt");
+            console.log("subscribed!");
           }
         });
       });
