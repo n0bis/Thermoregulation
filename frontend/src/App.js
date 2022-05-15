@@ -13,7 +13,7 @@ function App() {
 
   useEffect(() => {
     //getData();
-    getAlerts();
+    //getAlerts();
     var intervalId = window.setInterval(function () {
       //getData();
     }, 5000);
@@ -46,23 +46,28 @@ function App() {
   }
 
   function getAlerts() {
-    client.on("connect", () => {
-      console.log("CONNECTED to broker");
-    });
+    try {
+      client.on("connect", () => {
+        console.log("CONNECTED to broker");
+      });
 
-    client.on("connect", function () {
-      client.subscribe("test", function (err) {
-        if (!err) {
+      client.on("connect", function () {
+        client.subscribe("test", function (err) {
+          /*if (!err) {
           client.publish("test", "Hello mqtt");
         }
+        */
+        });
       });
-    });
 
-    client.on("message", function (topic, message) {
-      // message is Buffer
-      console.log(message.toString());
-      client.end();
-    });
+      client.on("message", function (topic, message) {
+        // message is Buffer
+        console.log(message.toString());
+        client.end();
+      });
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   useEffect(() => {
