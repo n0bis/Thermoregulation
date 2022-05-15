@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import mqtt from "precompiled-mqtt";
 
 // mosquitto test broker
-const URL = "mqtt://localhost:1884";
+const URL = "ws://localhost:9001";
 
 const client = mqtt.connect(URL);
 
@@ -12,7 +12,7 @@ function App() {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    //getData();
+    getData();
     //getAlerts();
     var intervalId = window.setInterval(function () {
       //getData();
@@ -43,31 +43,6 @@ function App() {
 
         console.log(temperatures);
       });
-  }
-
-  function getAlerts() {
-    try {
-      client.on("connect", () => {
-        console.log("CONNECTED to broker");
-      });
-
-      client.on("connect", function () {
-        client.subscribe("test", function (err) {
-          /*if (!err) {
-          client.publish("test", "Hello mqtt");
-        }
-        */
-        });
-      });
-
-      client.on("message", function (topic, message) {
-        // message is Buffer
-        console.log(message.toString());
-        client.end();
-      });
-    } catch (e) {
-      console.log(e);
-    }
   }
 
   useEffect(() => {
@@ -126,23 +101,63 @@ const AlertList = () => {
   const [alerts, setAlerts] = useState([]);
 
   useEffect(() => {
-    setAlerts([
-      {
-        msg: "Rules broken: too many degrees?",
-      },
-    ]);
+    //setAlerts([{ message: "LEDblink: blue", timestamp: "shiusasa" }]);
   }, []);
+
+  function getAlerts() {
+    try {
+      client.on("connect", () => {
+        console.log("CONNECTED to broker");
+      });
+
+      client.on("connect", function () {
+        client.subscribe("rules/alert", function (err) {
+          if (!err) {
+            //client.publish("test", "Hello mqtt");
+          }
+        });
+      });
+
+      client.on("message", function (topic, message) {
+        // message is Buffer
+        var alertsArray = alerts;
+        const currentDate = new Date();
+        const timestamp = currentDate.getTime();
+        alertsArray.push({
+          msg: message,
+          timestamp,
+        });
+        setAlerts(alertsArray);
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  }
 
   return (
     <div className="alert-box">
       <h4>Incomming alerts</h4>
       {alerts.length !== 0 ? (
         <ul>
-          {alerts.map((item) => (
-            <li>
-              <p>{item.msg}</p>
-            </li>
-          ))}
+          {alerts.map((item) => {
+            const response = item.message.split(" ");
+            const color = response[1];
+            if (response[0] !== "undefined") {
+              if (color === "blue") {
+                return (
+                  <li className={`alert-info blue`}>
+                    <p>It is too cold - {item.timestamp}</p>
+                  </li>
+                );
+              } else if (color === "red") {
+                return (
+                  <li className={`alert-info blue`}>
+                    <p>It is too hot {item.timestamp}</p>
+                  </li>
+                );
+              }
+            }
+          })}
         </ul>
       ) : (
         <div className="alert-info">No alerts found.</div>
@@ -158,13 +173,13 @@ const MyResponsiveLine = ({ data /* see data tab */ }) => (
     xScale={{ type: "point" }}
     yScale={{
       type: "linear",
-      min: "auto",
-      max: "auto",
+      min: "-40",
+      max: "40",
       stacked: true,
       reverse: false,
     }}
     minValue={-40}
-    maxValue={40}
+    maxValue={30}
     yFormat=" >-.2f"
     curve="cardinal"
     axisTop={null}
@@ -174,7 +189,7 @@ const MyResponsiveLine = ({ data /* see data tab */ }) => (
       tickSize: 5,
       tickPadding: 5,
       tickRotation: 0,
-      legend: "transportation",
+      legend: "Time",
       legendOffset: 36,
       legendPosition: "middle",
     }}
@@ -186,6 +201,7 @@ const MyResponsiveLine = ({ data /* see data tab */ }) => (
       legend: "count",
       legendOffset: -40,
       legendPosition: "middle",
+      maxValue: 301,
     }}
     pointSize={10}
     pointColor={{ theme: "background" }}

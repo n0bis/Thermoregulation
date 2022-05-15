@@ -118,6 +118,9 @@ body {
   background-color: #f44336;
   color: white;
 }
+.alert-box ul li.blue {
+  background-color: blue;
+}
 .alert-box ul li p {
   margin:0;
 }
