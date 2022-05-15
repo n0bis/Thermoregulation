@@ -149,13 +149,19 @@ const AlertList = () => {
               if (color === "blue") {
                 return (
                   <li className={`alert-info blue`}>
-                    <p>It is too cold - {item.timestamp}</p>
+                    <p>
+                      It is too cold - {item.timestamp.getHours()}{" "}
+                      {item.timestamp.getMinutes()}
+                    </p>
                   </li>
                 );
               } else if (color === "red") {
                 return (
                   <li className={`alert-info blue`}>
-                    <p>It is too hot {item.timestamp}</p>
+                    <p>
+                      It is too hot {item.timestamp.getHours()}{" "}
+                      {item.timestamp.getMinutes()}
+                    </p>
                   </li>
                 );
               }
