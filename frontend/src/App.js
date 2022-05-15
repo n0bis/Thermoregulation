@@ -105,6 +105,10 @@ const AlertList = () => {
     //setAlerts([{ message: "LEDblink: blue", timestamp: "shiusasa" }]);
   }, []);
 
+  useEffect(() => {
+    console.log(alerts);
+  }, [alerts]);
+
   function getAlerts() {
     try {
       client.on("connect", () => {
