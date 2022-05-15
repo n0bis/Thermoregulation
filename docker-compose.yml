@@ -137,6 +137,7 @@ services:
       - ./mosquitto/config:/mosquitto/config/
     ports:
       - 1884:1884
+      - 9001:9001
     networks:
       - network1
 
