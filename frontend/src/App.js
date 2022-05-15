@@ -124,6 +124,7 @@ const AlertList = () => {
         var alertsArray = alerts;
         const currentDate = new Date();
         const timestamp = currentDate.getTime();
+        console.log(message);
         alertsArray.push({
           msg: message,
           timestamp,
