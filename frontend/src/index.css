@@ -88,7 +88,7 @@ body {
   position: absolute;
   width: calc(100% - 40px);
   height: 2px;
-  bottom:210px;
+  bottom:250px;
   background-color: blue;
 }
 .red-line {
@@ -117,6 +117,7 @@ body {
   border-radius: 3px;
   background-color: #f44336;
   color: white;
+  margin-bottom: 10px;
 }
 .alert-box ul li.blue {
   background-color: blue;
