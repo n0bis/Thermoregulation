@@ -124,9 +124,10 @@ const AlertList = () => {
         var alertsArray = alerts;
         const currentDate = new Date();
         const timestamp = currentDate.getTime();
-        console.log(message);
+        const msg = new TextDecoder().decode(message);
+        console.log(msg);
         alertsArray.push({
-          msg: message,
+          msg,
           timestamp,
         });
         setAlerts(alertsArray);
