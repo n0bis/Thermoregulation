@@ -5,13 +5,17 @@ generate expressions "http://www.healthydrone.org/dsl/expressions/Expressions"
 import "http://www.eclipse.org/emf/2002/Ecore" as ecore
 
 RulesModel:
-	'Rule' name=AllowedNames
+	models += Model*
+;
+
+Model:
+	'Rule' name=AllowedRules value=STRING
 	rules += Rule*
 	'end'
 ;
 
 Rule:
-	 name=AllowedRules value=SignedInt (actions+=Action*) // 'action' action=Action
+	name=AllowedRules expression=OrExpression (actions+=Action*)
 ;
 
 SignedInt returns ecore::EInt: '-'? INT;
@@ -24,8 +28,20 @@ Action:
 	 'action' name=AllowedActions value=STRING  // actions+=Action*
 ;
 
-AllowedNames:
-	'temperature' | 'humidity'
+OrExpression returns Expression:
+    AndExpression ({OrExpression.left=current} "||" right=AndExpression)*  
+;   
+
+AndExpression returns Expression:
+    ComparisonExpression ({AndExpression.left=current} "&&" right=ComparisonExpression)*  
+;
+
+ComparisonExpression returns Expression:
+    Literal ({ComparisonExpression.left=current} operator=("<"|"<="|"=="|">="|">") right=ComparisonExpression)*
+;
+
+Literal returns Expression:
+    {Literal} value="true" | "false" | SignedInt | AllowedRules
 ;
 
 AllowedActions:
@@ -33,5 +49,5 @@ AllowedActions:
 ;
 
 AllowedRules:
-	'minTemperature' | 'maxTemperature'
+	'temperature' | 'humidity'
 ;

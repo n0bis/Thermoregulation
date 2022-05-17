@@ -27,7 +27,7 @@ class ExpressionsValidator extends AbstractExpressionsValidator {
 //		}
 //	}
 
-	public static final String VAR_UNIQUE = 'var_unique'
+	/*public static final String VAR_UNIQUE = 'var_unique'
 	@Check
 	def checkVariablesExist(Rule rule) {
 		if ((rule.eContainer as RulesModel).rules.filter[name == rule.name].size > 1) 
@@ -73,5 +73,5 @@ class ExpressionsValidator extends AbstractExpressionsValidator {
 			}
 		}
 		 
-	}
+	}*/
 }

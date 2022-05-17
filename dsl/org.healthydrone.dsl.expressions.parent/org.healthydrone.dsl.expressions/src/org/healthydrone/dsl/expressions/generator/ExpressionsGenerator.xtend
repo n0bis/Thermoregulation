@@ -51,12 +51,14 @@ override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorCo
 	})
 	consumer.subscribe(['temperature'])
 	
-	«FOR r : rules.rules»
-		«r.name» = «r.value»
+	«FOR model : rules.models»
+		«FOR r : model.rules»
+	«r.name» = «r.expression»
+		«ENDFOR»
 	«ENDFOR»
 	
 	with driver.session() as session:
-		session.run(("CREATE (rule:Rule {nameSpace: '«rules.name»', "
+		session.run(("CREATE (rule:Rule {nameSpace: 'test', "
 			"min: "+ str(minTemperature) +", "
 			"max: "+ str(maxTemperature) + "})"
 		))
@@ -73,27 +75,21 @@ override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorCo
 		try:
 			print('Received message: {}'.format(msg.value().decode('utf-8')))
 			event = json.loads(msg.value().decode('utf-8'))
-			if minTemperature > event["value"]:
-				«FOR rule : rules.rules»
-				«IF rule.name == "minTemperature"»
-				«FOR action : rule.actions»
-				client.publish("rules/alert", "«action.name»: «action.value.toString()»")
-				«ENDFOR»
-				«ENDIF»
-				«ENDFOR»
-				print("Too cold! - publish to mqtt")
-			elif maxTemperature < event["value"]:
-				«FOR rule : rules.rules»
-				«IF rule.name == "maxTemperature"»
-				«FOR action : rule.actions»
-				client.publish("rules/alert", "«action.name»: «action.value.toString()»")
-				«ENDFOR»
-				«ENDIF»
+			temperature = event["temperature"]["value"]
+			humidity = event["humidity"]["level"]
+				«FOR model : rules.models»
+					«FOR rule : model.rules»
+
+							«FOR action : rule.actions»
+					client.publish("rules/temperature/alert", "«action.name»: «action.value.toString()»")
+							«ENDFOR»
+
+					«ENDFOR»
 				«ENDFOR»
 				print("Too hot! - publish to mqtt")
 			else:
-				print("No rule broken move along - publish to mqtt")
-				client.publish("rules/alert", "")
+				print("No temperature rule broken move along - publish to mqtt")
+				client.publish("rules/humidity/alert", "")
 		except Exception as err:
 			print(err)
 			continue
