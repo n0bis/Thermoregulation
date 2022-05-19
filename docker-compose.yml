@@ -1,11 +1,42 @@
 version: "3.3"
 
 services:
+  ksqldb-server:
+    image: confluentinc/ksqldb-server:0.26.0
+    hostname: ksqldb-server
+    container_name: ksqldb-server
+    ports:
+      - "8068:8068"
+    environment:
+      KSQL_LISTENERS: http://0.0.0.0:8068
+      KSQL_BOOTSTRAP_SERVERS: kafka:29092
+
+      KSQL_KSQL_LOGGING_PROCESSING_STREAM_AUTO_CREATE: "true"
+      KSQL_KSQL_LOGGING_PROCESSING_TOPIC_AUTO_CREATE: "true"
+      KSQL_KSQL_STREAMS_REPLICATION_FACTOR: 1
+      KSQL_KSQL_INTERNAL_TOPIC_REPLICAS: 1
+      
+    networks:
+      - network1
+    depends_on:
+      - kafka
+      
+  ksqldb-cli:
+    image: confluentinc/ksqldb-cli:0.26.0
+    container_name: ksqldb-cli
+    depends_on:
+      - ksqldb-server
+      - kafka
+    entrypoint: /bin/sh
+    tty: true
+    networks:
+      - network1
+
   zookeeper:
     image: confluentinc/cp-zookeeper:${CONF_VER}
     hostname: zookeeper
     container_name: zookeeper
-    ports:
+    ports: 
       - 2181:2181
     networks:
       - network1
@@ -26,6 +57,7 @@ services:
       - network1
     environment:
       TZ: ${TZ_SET}
+      KAFKA_BROKER_ID: 1
       KAFKA_ADVERTISED_HOST_NAME: kafka
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
@@ -33,7 +65,10 @@ services:
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+    
   kafka-mqtt:
     image: confluentinc/cp-kafka-mqtt:${CONF_VER}
     hostname: mqtt

@@ -24,7 +24,7 @@ chan PUBLISH, PUBACK, PUBREC, PUBREL, PUBCOMP, PUBLISHGATEWAY;
 clock x1, T, desc;
 
 //Workercontroler/gatewayController
-chan temp_sensor1, temp_sensor2;
+chan temp_sensor1, temp_sensor2, temp_sensor3, temp_sensor4;
 
 //ProbModelPup
 int p_QS = 1;
@@ -443,6 +443,20 @@ AwaitingPing=1</label>
 		<transition>
 			<source ref="id34"/>
 			<target ref="id34"/>
+			<label kind="synchronisation" x="-33" y="-199">temp_sensor4!</label>
+			<nail x="-51" y="-187"/>
+			<nail x="68" y="-178"/>
+		</transition>
+		<transition>
+			<source ref="id34"/>
+			<target ref="id34"/>
+			<label kind="synchronisation" x="-75" y="131">temp_sensor3!</label>
+			<nail x="25" y="153"/>
+			<nail x="-93" y="144"/>
+		</transition>
+		<transition>
+			<source ref="id34"/>
+			<target ref="id34"/>
 			<label kind="synchronisation" x="-153" y="-144">temp_sensor2!</label>
 			<nail x="-110" y="-127"/>
 			<nail x="-110" y="-17"/>
@@ -465,6 +479,18 @@ AwaitingPing=1</label>
 		<location id="id37" x="-399" y="68">
 		</location>
 		<init ref="id35"/>
+		<transition>
+			<source ref="id35"/>
+			<target ref="id36"/>
+			<label kind="synchronisation" x="-398" y="-80">temp_sensor4?</label>
+			<nail x="-416" y="-127"/>
+		</transition>
+		<transition>
+			<source ref="id35"/>
+			<target ref="id36"/>
+			<label kind="synchronisation" x="-458" y="-38">temp_sensor3?</label>
+			<nail x="-399" y="-42"/>
+		</transition>
 		<transition>
 			<source ref="id37"/>
 			<target ref="id35"/>

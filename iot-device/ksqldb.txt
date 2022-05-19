@@ -1,0 +1,8 @@
+create table avgtemptable as SELECT key, latest_by_offset(value) as value, CEIL(SUM(value) / count(*)) as avg_temp from avgtemp windo
+w tumbling(size 1 minute) group by key emit changes;
+
+create table avgtemptable2 as SELECT key, avg(value) as avg_temp from avgtemp window tumbling(size 1 minute) group by key emit change
+s;
+
+create table avgtemptable3 as SELECT key, latest_by_offset(value) as avg_temp from avgtemp window tumbling(size 1 minute) group by ke
+y emit changes;
