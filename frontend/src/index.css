@@ -122,6 +122,9 @@ body {
 .alert-box ul li.blue {
   background-color: blue;
 }
+.alert-box ul li.red {
+  background-color: red;
+}
 .alert-box ul li p {
   margin:0;
 }

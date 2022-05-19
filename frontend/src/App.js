@@ -132,7 +132,7 @@ const AlertList = () => {
         console.log(msg);
         alertsArray.push({
           msg,
-          timestamp,
+          currentDate,
         });
         setAlerts(alertsArray);
       });
@@ -154,17 +154,17 @@ const AlertList = () => {
                 return (
                   <li className={`alert-info blue`}>
                     <p>
-                      It is too cold - {item.timestamp.getHours()}{" "}
-                      {item.timestamp.getMinutes()}
+                      It is too cold - {item.currentDate.getHours()}{" "}
+                      {item.currentDate.getMinutes()}
                     </p>
                   </li>
                 );
               } else if (color === "red") {
                 return (
-                  <li className={`alert-info blue`}>
+                  <li className={`alert-info red`}>
                     <p>
-                      It is too hot {item.timestamp.getHours()}{" "}
-                      {item.timestamp.getMinutes()}
+                      It is too hot {item.currentDate.getHours()}{" "}
+                      {item.currentDate.getMinutes()}
                     </p>
                   </li>
                 );

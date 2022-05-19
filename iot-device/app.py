@@ -7,7 +7,7 @@ client = mqtt.Client("Temperature_Inside")
 client.connect("localhost", 1883, 60) 
 
 while True:
-    randNumber = randrange(0, 21.0)
+    randNumber = randrange(0, 50.0)
     event = {"value": randNumber, "timestamp": int(time())}
     client.publish("TEMPERATURE", json.dumps(event))
     print(f'Just published {json.dumps(event)} to topic TEMPERATURE')
