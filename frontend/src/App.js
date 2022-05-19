@@ -132,6 +132,7 @@ const AlertList = () => {
         console.log(msg);
         alertsArray.push({
           msg,
+          currentDate,
           timestamp,
         });
         setAlerts(alertsArray);
@@ -154,8 +155,8 @@ const AlertList = () => {
                 return (
                   <li className={`alert-info blue`}>
                     <p>
-                      It is too cold - {item.timestamp.getHours()}{" "}
-                      {item.timestamp.getMinutes()}
+                      It is too cold - {item.currentDate.getHours()}{" "}
+                      {item.currentDate.getMinutes()}
                     </p>
                   </li>
                 );
@@ -163,8 +164,8 @@ const AlertList = () => {
                 return (
                   <li className={`alert-info blue`}>
                     <p>
-                      It is too hot {item.timestamp.getHours()}{" "}
-                      {item.timestamp.getMinutes()}
+                      It is too hot {item.currentDate.getHours()}{" "}
+                      {item.currentDate.getMinutes()}
                     </p>
                   </li>
                 );
