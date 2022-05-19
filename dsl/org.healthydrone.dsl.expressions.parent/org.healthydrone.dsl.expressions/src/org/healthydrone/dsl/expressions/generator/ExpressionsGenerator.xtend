@@ -49,7 +49,7 @@ override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorCo
 	    'bootstrap.servers': 'localhost',
 	    'auto.offset.reset': 'latest'
 	})
-	consumer.subscribe(['temperature'])
+	consumer.subscribe(['AVGTEMPTABLE3'])
 	
 	«FOR r : rules.rules»
 		«r.name» = «r.value»
@@ -73,7 +73,7 @@ override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorCo
 		try:
 			print('Received message: {}'.format(msg.value().decode('utf-8')))
 			event = json.loads(msg.value().decode('utf-8'))
-			if minTemperature > event["value"]:
+			if minTemperature > event["VALUE"] or minTemperature > event['AVG_TEMP']:
 				«FOR rule : rules.rules»
 				«IF rule.name == "minTemperature"»
 				«FOR action : rule.actions»
@@ -82,7 +82,7 @@ override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorCo
 				«ENDIF»
 				«ENDFOR»
 				print("Too cold! - publish to mqtt")
-			elif maxTemperature < event["value"]:
+			elif maxTemperature < event["VALUE"] or maxTemperature < event['AVG_TEMP']:
 				«FOR rule : rules.rules»
 				«IF rule.name == "maxTemperature"»
 				«FOR action : rule.actions»

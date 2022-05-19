@@ -19,9 +19,9 @@ consumer = Consumer({
     'bootstrap.servers': 'localhost',
     'auto.offset.reset': 'latest'
 })
-consumer.subscribe(['temperature'])
+consumer.subscribe(['AVGTEMPTABLE3'])
 
-maxTemperature = 21
+maxTemperature = 22
 minTemperature = -5
 
 with driver.session() as session:
@@ -42,10 +42,10 @@ while True:
 	try:
 		print('Received message: {}'.format(msg.value().decode('utf-8')))
 		event = json.loads(msg.value().decode('utf-8'))
-		if minTemperature > event["value"]:
+		if minTemperature > event["VALUE"] or minTemperature > event['AVG_TEMP']:
 			client.publish("rules/alert", "LEDblink: blue")
 			print("Too cold! - publish to mqtt")
-		elif maxTemperature < event["value"]:
+		elif maxTemperature < event["VALUE"] or maxTemperature < event['AVG_TEMP']:
 			client.publish("rules/alert", "LEDblink: red")
 			print("Too hot! - publish to mqtt")
 		else:

@@ -1,4 +1,4 @@
 Rule temperature apples
-maxTemperature 21 action LEDblink "red"
+maxTemperature 22 action LEDblink "red"
 minTemperature -5 action LEDblink "blue"
 end

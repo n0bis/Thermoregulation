@@ -29,5 +29,5 @@ AllowedActions:
 ;
 
 AllowedRules:
-	'minTemperature' | 'maxTemperature'
+	'minTemperature' | 'maxTemperature' 
 ;
