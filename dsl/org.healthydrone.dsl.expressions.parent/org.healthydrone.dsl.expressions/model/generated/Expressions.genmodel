@@ -18,6 +18,7 @@
     <genClasses ecoreClass="Expressions.ecore#//Rule">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Expressions.ecore#//Rule/name"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Expressions.ecore#//Rule/value"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Expressions.ecore#//Rule/sensors"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Expressions.ecore#//Rule/actions"/>
     </genClasses>
     <genClasses ecoreClass="Expressions.ecore#//Action">

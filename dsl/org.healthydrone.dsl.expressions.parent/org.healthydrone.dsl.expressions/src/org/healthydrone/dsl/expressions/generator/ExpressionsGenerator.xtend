@@ -51,16 +51,6 @@ override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorCo
 	})
 	consumer.subscribe(['temperature'])
 	
-	«FOR r : rules.rules»
-		«r.name» = «r.value»
-	«ENDFOR»
-	
-	with driver.session() as session:
-		session.run(("CREATE (rule:Rule {nameSpace: '«rules.name»', "
-			"min: "+ str(minTemperature) +", "
-			"max: "+ str(maxTemperature) + "})"
-		))
-	
 	while True:
 		msg = consumer.poll(1.0)
 	
@@ -73,27 +63,32 @@ override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorCo
 		try:
 			print('Received message: {}'.format(msg.value().decode('utf-8')))
 			event = json.loads(msg.value().decode('utf-8'))
-			if minTemperature > event["value"]:
-				«FOR rule : rules.rules»
-				«IF rule.name == "minTemperature"»
-				«FOR action : rule.actions»
-				client.publish("rules/alert", "«action.name»: «action.value.toString()»")
-				«ENDFOR»
-				«ENDIF»
-				«ENDFOR»
-				print("Too cold! - publish to mqtt")
-			elif maxTemperature < event["value"]:
-				«FOR rule : rules.rules»
-				«IF rule.name == "maxTemperature"»
-				«FOR action : rule.actions»
-				client.publish("rules/alert", "«action.name»: «action.value.toString()»")
-				«ENDFOR»
-				«ENDIF»
-				«ENDFOR»
-				print("Too hot! - publish to mqtt")
-			else:
-				print("No rule broken move along - publish to mqtt")
-				client.publish("rules/alert", "")
+			
+			«FOR rule : rules.rules»
+			«FOR sensor : rule.sensors»
+			«IF rule.name == "minTemperature"»
+			if event["id"] == «sensor»:
+				if «rule.value» > event["value"]:
+					«FOR action : rule.actions»
+					client.publish("rules/alert", json.dumps({"sensor": «sensor», "«action.name»": "«action.value.toString()»"}))
+					«ENDFOR»
+					print("Sensor «sensor» Too cold! - publish to mqtt")
+					continue
+			«ENDIF»
+			«IF rule.name == "maxTemperature"»
+			if event["id"] == «sensor»:
+				if «rule.value» < event["value"]:
+					«FOR action : rule.actions»
+					client.publish("rules/alert", json.dumps({"sensor": «sensor», "«action.name»": "«action.value.toString()»"}))
+					«ENDFOR»
+					print("Sensor «sensor» Too hot! - publish to mqtt")
+					continue
+			«ENDIF»
+			«ENDFOR»			
+			«ENDFOR»
+
+			print("No rule broken move along - publish to mqtt")
+			client.publish("rules/alert", "")
 		except Exception as err:
 			print(err)
 			continue

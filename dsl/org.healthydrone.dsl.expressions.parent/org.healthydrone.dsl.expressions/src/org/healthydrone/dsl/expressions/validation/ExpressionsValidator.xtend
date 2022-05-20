@@ -27,12 +27,14 @@ class ExpressionsValidator extends AbstractExpressionsValidator {
 //		}
 //	}
 
+	/*
 	public static final String VAR_UNIQUE = 'var_unique'
+
 	@Check
 	def checkVariablesExist(Rule rule) {
 		if ((rule.eContainer as RulesModel).rules.filter[name == rule.name].size > 1) 
 			error("Duplicate variables", ExpressionsPackage.eINSTANCE.rule_Name, VAR_UNIQUE)
-	}
+	} */
 	
 	public static final String MIN_HIGHER_MAX = 'min_higher_max'
 	

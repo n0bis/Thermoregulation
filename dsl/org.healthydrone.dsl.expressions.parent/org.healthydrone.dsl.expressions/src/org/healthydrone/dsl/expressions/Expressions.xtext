@@ -11,7 +11,7 @@ RulesModel:
 ;
 
 Rule:
-	 name=AllowedRules value=SignedInt (actions+=Action*) // 'action' action=Action
+	 name=AllowedRules value=SignedInt ('sensors' (sensors+=INT (',' sensors += INT)*)*)? (actions+=Action*) // 'action' action=Action
 ;
 
 SignedInt returns ecore::EInt: '-'? INT;
@@ -23,6 +23,7 @@ enum Color:
 Action:
 	 'action' name=AllowedActions value=STRING  // actions+=Action*
 ;
+
 
 AllowedActions:
 	'LEDblink' | 'log'

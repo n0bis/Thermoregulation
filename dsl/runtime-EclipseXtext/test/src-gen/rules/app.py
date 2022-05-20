@@ -21,15 +21,6 @@ consumer = Consumer({
 })
 consumer.subscribe(['temperature'])
 
-maxTemperature = 21
-minTemperature = -5
-
-with driver.session() as session:
-	session.run(("CREATE (rule:Rule {nameSpace: 'apples', "
-		"min: "+ str(minTemperature) +", "
-		"max: "+ str(maxTemperature) + "})"
-	))
-
 while True:
 	msg = consumer.poll(1.0)
 
@@ -42,15 +33,35 @@ while True:
 	try:
 		print('Received message: {}'.format(msg.value().decode('utf-8')))
 		event = json.loads(msg.value().decode('utf-8'))
-		if minTemperature > event["value"]:
-			client.publish("rules/alert", "LEDblink: blue")
-			print("Too cold! - publish to mqtt")
-		elif maxTemperature < event["value"]:
-			client.publish("rules/alert", "LEDblink: red")
-			print("Too hot! - publish to mqtt")
-		else:
-			print("No rule broken move along - publish to mqtt")
-			client.publish("rules/alert", "")
+		
+		if event["id"] == 1:
+			if 15 < event["value"]:
+				client.publish("rules/alert", json.dumps({"sensor": 1, "LEDblink": "red"}))
+				print("Sensor 1 Too hot! - publish to mqtt")
+				continue
+		if event["id"] == 2:
+			if 15 < event["value"]:
+				client.publish("rules/alert", json.dumps({"sensor": 2, "LEDblink": "red"}))
+				print("Sensor 2 Too hot! - publish to mqtt")
+				continue
+		if event["id"] == 3:
+			if 15 < event["value"]:
+				client.publish("rules/alert", json.dumps({"sensor": 3, "LEDblink": "red"}))
+				print("Sensor 3 Too hot! - publish to mqtt")
+				continue
+		if event["id"] == 1:
+			if 5 > event["value"]:
+				client.publish("rules/alert", json.dumps({"sensor": 1, "LEDblink": "blue"}))
+				print("Sensor 1 Too cold! - publish to mqtt")
+				continue
+		if event["id"] == 2:
+			if 10 > event["value"]:
+				client.publish("rules/alert", json.dumps({"sensor": 2, "LEDblink": "red"}))
+				print("Sensor 2 Too cold! - publish to mqtt")
+				continue
+
+		print("No rule broken move along - publish to mqtt")
+		client.publish("rules/alert", "")
 	except Exception as err:
 		print(err)
 		continue
