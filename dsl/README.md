@@ -13,13 +13,14 @@ maxTemperature <int> action LEDblink <red> | <green> | <blue>
 end
 ```
 
-Rule temperature "apples"
+Rule temperature "red apples"
 temperature >= 21 || temperature <= 0 action LEDblink red
 end
 
-Rule humidty "apples"
+Rule humidity "blue apples"
 humidity >= 60 || humidity <= 40 action LEDblink blue
 end
 
-Rule temperature "hejsan"
+Rule temperature "green apples"
 temperature == 21 && humidity == 80 action LEDblink red
+end
