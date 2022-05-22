@@ -1,5 +1,7 @@
 Rule temperature apples
 maxTemperature 15 sensors 1, 2, 3 action LEDblink "red"
-minTemperature 5 sensors 1 action LEDblink "blue"
-minTemperature 10 sensors 2 action LEDblink "red"
+minTemperature 5 sensors 2 action LEDblink "blue"
+minTemperature 10 sensors 3 action LEDblink "red"
+minTemperature 10 sensors 1
+maxTemperature 10 sensors 4 action LEDblink "red"
 end

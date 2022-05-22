@@ -9,6 +9,9 @@ import org.eclipse.xtext.generator.IFileSystemAccess2
 import org.eclipse.xtext.generator.IGeneratorContext
 import org.healthydrone.dsl.expressions.expressions.RulesModel
 import java.io.File
+import java.util.Arrays
+import java.util.Map
+import java.util.ArrayList
 
 /**
  * Generates code from your model files on save.
@@ -16,9 +19,10 @@ import java.io.File
  * See https://www.eclipse.org/Xtext/documentation/303_runtime_concepts.html#code-generation
  */
 class ExpressionsGenerator extends AbstractGenerator {
+	static ArrayList<Integer> sensors = new ArrayList<Integer>();
 
-override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorContext context) {
-	val rule = resource.allContents.filter(RulesModel).next
+	override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorContext context) {
+		val rule = resource.allContents.filter(RulesModel).next
 		new File("rules").mkdirs()
 		generateMathFile(rule, "rules", fsa)
 	}
@@ -63,28 +67,28 @@ override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorCo
 		try:
 			print('Received message: {}'.format(msg.value().decode('utf-8')))
 			event = json.loads(msg.value().decode('utf-8'))
-			
-			«FOR rule : rules.rules»
-			«FOR sensor : rule.sensors»
-			«IF rule.name == "minTemperature"»
+						
+			«FOR sensor : rules.getSensors()»
 			if event["id"] == «sensor»:
+				«FOR rule : rules.rules»
+				«IF rule.sensors.contains(sensor)»
+				«IF rule.name == "minTemperature"»
 				if «rule.value» > event["value"]:
 					«FOR action : rule.actions»
 					client.publish("rules/alert", json.dumps({"sensor": «sensor», "«action.name»": "«action.value.toString()»"}))
 					«ENDFOR»
 					print("Sensor «sensor» Too cold! - publish to mqtt")
-					continue
-			«ENDIF»
-			«IF rule.name == "maxTemperature"»
-			if event["id"] == «sensor»:
+				«ENDIF»		
+				«IF rule.name == "maxTemperature"»
 				if «rule.value» < event["value"]:
 					«FOR action : rule.actions»
 					client.publish("rules/alert", json.dumps({"sensor": «sensor», "«action.name»": "«action.value.toString()»"}))
 					«ENDFOR»
 					print("Sensor «sensor» Too hot! - publish to mqtt")
-					continue
-			«ENDIF»
-			«ENDFOR»			
+				«ENDIF»			
+				«ENDIF»			
+				«ENDFOR»
+				continue
 			«ENDFOR»
 
 			print("No rule broken move along - publish to mqtt")
@@ -96,4 +100,30 @@ override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorCo
 	c.close()
 
 	'''
+	def static ArrayList<Integer> getSensors(RulesModel rules) {
+		val ArrayList<Integer> tempSensors = new ArrayList<Integer>();
+		
+		for (rule : rules.rules) {
+			for (s : rule.sensors) {
+				tempSensors.add(s)
+			}
+		}
+		
+		return removeDuplicates(tempSensors)
+	}
+	
+	def static ArrayList<Integer> removeDuplicates(ArrayList<Integer> list)
+    {
+      	val ArrayList<Integer> newList = new ArrayList<Integer>();
+
+        for (Integer element : list) {
+            if (!newList.contains(element)) {
+                newList.add(element);
+            }
+        }
+  
+        return newList;
+    }
+	
+	
 }
