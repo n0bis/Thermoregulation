@@ -9,45 +9,53 @@ RulesModel:
 ;
 
 Model:
-	'Rule' name=AllowedRules value=STRING
+	'Rule' value=STRING
 	rules += Rule*
 	'end'
 ;
 
 Rule:
-	name=AllowedRules expression=OrExpression (actions+=Action*)
+	expression=Expression (actions+=Action*)
 ;
-
-SignedInt returns ecore::EInt: '-'? INT;
 
 enum Color:
     RED = 'red' | GREEN = 'green' | BLUE = 'blue'
 ;
 
 Action:
-	 'action' name=AllowedActions value=STRING  // actions+=Action*
+	 'action' name=AllowedActions value=Color
 ;
 
-OrExpression returns Expression:
-    AndExpression ({OrExpression.left=current} "||" right=AndExpression)*  
-;   
+Expression: Or;
 
-AndExpression returns Expression:
-    ComparisonExpression ({AndExpression.left=current} "&&" right=ComparisonExpression)*  
+Or returns Expression:
+	And ({Or.left=current} "||" right=And)*
 ;
 
-ComparisonExpression returns Expression:
-    Literal ({ComparisonExpression.left=current} operator=("<"|"<="|"=="|">="|">") right=ComparisonExpression)*
+And returns Expression:
+	Equality ({And.left=current} "&&" right=Equality)*
 ;
 
-Literal returns Expression:
-    {Literal} value="true" | "false" | SignedInt | AllowedRules
+Equality returns Expression: 
+	Comparison (
+		{Equality.left=current} op=("=="|"!=")
+       	right=Comparison
+    )*
 ;
+
+Comparison returns Expression: 
+	Atomic (
+		{Comparison.left=current} op=(">="|"<="|">"|"<")
+   		right=Atomic
+    )*
+;
+
+Atomic returns Expression:
+	{IntConstant} value=SignedInt | {StringConstant} value=('temperature' | 'humidity')
+;
+
+SignedInt returns ecore::EInt: '-'? INT;
 
 AllowedActions:
 	'LEDblink' | 'log'
-;
-
-AllowedRules:
-	'temperature' | 'humidity'
 ;

@@ -51,12 +51,6 @@ override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorCo
 	})
 	consumer.subscribe(['temperature'])
 	
-	«FOR model : rules.models»
-		«FOR r : model.rules»
-	«r.name» = «r.expression»
-		«ENDFOR»
-	«ENDFOR»
-	
 	with driver.session() as session:
 		session.run(("CREATE (rule:Rule {nameSpace: 'test', "
 			"min: "+ str(minTemperature) +", "

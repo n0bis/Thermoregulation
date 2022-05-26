@@ -24,7 +24,7 @@ chan PUBLISH, PUBACK, PUBREC, PUBREL, PUBCOMP, PUBLISHGATEWAY;
 clock x1, T, desc;
 
 //Workercontroler/gatewayController
-chan temp_sensor1;
+chan temp_sensor1, temp_sensor2, temp_sensor3, temp_sensor4;
 
 //ProbModelPup
 int p_QS = 2;
@@ -438,9 +438,30 @@ AwaitingPing=1</label>
 	<template>
 		<name>WorkerController</name>
 		<location id="id34" x="0" y="0">
-			<name x="-110" y="17">WorkerController</name>
+			<name x="-68" y="-153">WorkerController</name>
 		</location>
 		<init ref="id34"/>
+		<transition>
+			<source ref="id34"/>
+			<target ref="id34"/>
+			<label kind="synchronisation" x="-221" y="25">temp_sensor3!</label>
+			<nail x="-93" y="68"/>
+			<nail x="-110" y="-8"/>
+		</transition>
+		<transition>
+			<source ref="id34"/>
+			<target ref="id34"/>
+			<label kind="synchronisation" x="-59" y="119">temp_sensor4!</label>
+			<nail x="8" y="110"/>
+			<nail x="-76" y="102"/>
+		</transition>
+		<transition>
+			<source ref="id34"/>
+			<target ref="id34"/>
+			<label kind="synchronisation" x="-153" y="-85">temp_sensor2!</label>
+			<nail x="-8" y="-110"/>
+			<nail x="-59" y="-51"/>
+		</transition>
 		<transition>
 			<source ref="id34"/>
 			<target ref="id34"/>
@@ -460,6 +481,23 @@ AwaitingPing=1</label>
 		</location>
 		<init ref="id35"/>
 		<transition>
+			<source ref="id35"/>
+			<target ref="id36"/>
+			<label kind="synchronisation" x="-442" y="0">temp_sensor4?</label>
+		</transition>
+		<transition>
+			<source ref="id35"/>
+			<target ref="id36"/>
+			<label kind="synchronisation" x="-399" y="-59">temp_sensor3?</label>
+			<nail x="-391" y="-42"/>
+		</transition>
+		<transition>
+			<source ref="id35"/>
+			<target ref="id36"/>
+			<label kind="synchronisation" x="-391" y="-102">temp_sensor2?</label>
+			<nail x="-391" y="-85"/>
+		</transition>
+		<transition>
 			<source ref="id37"/>
 			<target ref="id35"/>
 			<label kind="synchronisation" x="-561" y="76">PUBLISHGATEWAY!</label>
@@ -474,8 +512,8 @@ AwaitingPing=1</label>
 		<transition>
 			<source ref="id35"/>
 			<target ref="id36"/>
-			<label kind="synchronisation" x="-442" y="-85">temp_sensor1?</label>
-			<nail x="-391" y="-68"/>
+			<label kind="synchronisation" x="-442" y="-161">temp_sensor1?</label>
+			<nail x="-391" y="-127"/>
 		</transition>
 	</template>
 	<template>

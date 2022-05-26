@@ -13,6 +13,8 @@ maxTemperature <int> action LEDblink <red> | <green> | <blue>
 end
 ```
 
+var temperature = mean(sensor1, sensor2, sensor3, sensor4)
+
 Rule temperature "red apples"
 temperature >= 21 || temperature <= 0 action LEDblink red
 end

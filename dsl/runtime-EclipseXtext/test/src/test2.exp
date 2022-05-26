@@ -1,11 +1,3 @@
-Rule temperature "red apples"
-temperature >= 21 || temperature <= 0 action LEDblink "red"
-end
-
-Rule humidity "blue apples"
-humidity >= 60 || humidity <= 40 action LEDblink "blue"
-end
-
-Rule temperature "green apples"
-temperature == 21 && humidity == 80 action LEDblink "red"
+Rule "red apples"
+	temperature <= -21 || temperature >= 21 action LEDblink red
 end
