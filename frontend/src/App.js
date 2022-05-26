@@ -10,6 +10,7 @@ const client = mqtt.connect(URL);
 
 function App() {
   const [data, setData] = useState([]);
+  const [isLoading, setLoading] = useState(true);
 
   useEffect(() => {
     getData();
@@ -20,6 +21,7 @@ function App() {
   }, []);
 
   function getData() {
+    setLoading(true);
     fetch("http://localhost:4000", {
       body: '{"query":"query ExampleQuery {sensors {id,temperature { value, tracked_at}}}"}',
       headers: {
@@ -44,6 +46,7 @@ function App() {
         console.log(fixedData);
 
         setData(fixedData);
+        setLoading(false);
 
         console.log(temperatures);
       });
@@ -76,7 +79,9 @@ function App() {
           <div className="container">
             <div className="chart">
               <div className="red-line" />
-              {data.length !== 0 && <MyResponsiveLine data={data} />}
+              {!isLoading && data.length !== 0 && (
+                <MyResponsiveLine data={data} />
+              )}
               <div className="blue-line" />
             </div>
             <AlertList />
