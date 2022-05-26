@@ -16,5 +16,3 @@ while True:
         client.publish("TEMPERATURE", json.dumps(event))
         print(f'Just published {json.dumps(event)} to topic TEMPERATURE')
     sleep(5)
-
-    
