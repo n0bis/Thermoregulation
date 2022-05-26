@@ -10,25 +10,14 @@ RulesModel:
 	'end'
 ;
 
-Rule:
-	 name=AllowedRules value=SignedInt ('sensors' (sensors+=INT (',' sensors += INT)*)*)? (actions+=Action*) // 'action' action=Action
-;
+Rule: name=AllowedRules value=SignedInt ('sensors' (sensors+=INT (',' sensors += INT)*)*)? (actions+=Action*);
 
 SignedInt returns ecore::EInt: '-'? INT;
 
-enum Color:
-    RED = 'red' | GREEN = 'green' | BLUE = 'blue'
-;
+enum Color: RED = 'red' | GREEN = 'green' | BLUE = 'blue';
 
-Action:
-	 'action' name=AllowedActions value=STRING  // actions+=Action*
-;
+Action: 'action' name=AllowedActions value=STRING;
 
+AllowedActions:	'LEDblink' | 'log';
 
-AllowedActions:
-	'LEDblink' | 'log'
-;
-
-AllowedRules:
-	'minTemperature' | 'maxTemperature'
-;
+AllowedRules: 'minTemperature' | 'maxTemperature';
