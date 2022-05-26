@@ -17,4 +17,3 @@ while True:
         print(f'Just published {json.dumps(event)} to topic TEMPERATURE')
     sleep(5)
 
-    

@@ -21,7 +21,7 @@ function App() {
 
   function getData() {
     fetch("http://localhost:4000", {
-      body: '{"query":"query ExampleQuery {temperatures {value tracked_at} trucks {name}}"}',
+      body: '{"query":"query ExampleQuery {sensors {id,temperature { value, tracked_at}}}"}',
       headers: {
         "Content-Type": "application/json",
       },
@@ -29,17 +29,21 @@ function App() {
     })
       .then((response) => response.json())
       .then((response) => {
-        console.log(response.data.temperatures);
+        console.log(response.data);
         const { data } = response;
         const { temperatures } = data;
 
-        setData([
-          {
-            id: "Temperature",
-            color: "hsl(84, 70%, 50%)",
-            data: dataConverter(temperatures),
-          },
-        ]);
+        const fixedData = [];
+
+        data.sensors.forEach((item) => {
+          fixedData.push({
+            id: `Sensor ${item.id}`,
+            data: dataConverter(item.temperature),
+          });
+        });
+        console.log(fixedData);
+
+        setData(fixedData);
 
         console.log(temperatures);
       });
@@ -54,7 +58,7 @@ function App() {
       <div className="sidebar">
         <ul>
           <li className="active">
-            <a href="#">Dashbsoard</a>
+            <a href="#">Dashboard</a>
           </li>
           <li>
             <a href="#">Rules manager</a>
@@ -88,6 +92,8 @@ function dataConverter(data) {
   console.log(data);
 
   data.forEach((element) => {
+    var date = new Date(element.tracked_at);
+    console.log(date.toDateString());
     convertedData.push({
       x: element.tracked_at,
       y: element.value,
@@ -188,7 +194,7 @@ const MyResponsiveLine = ({ data /* see data tab */ }) => (
       type: "linear",
       min: "-40",
       max: "40",
-      stacked: true,
+      stacked: false,
       reverse: false,
     }}
     minValue={-40}
@@ -203,6 +209,7 @@ const MyResponsiveLine = ({ data /* see data tab */ }) => (
       tickPadding: 5,
       tickRotation: 0,
       legend: "Time",
+      tickValues: 3,
       legendOffset: 36,
       legendPosition: "middle",
     }}
@@ -250,107 +257,6 @@ const MyResponsiveLine = ({ data /* see data tab */ }) => (
     ]}
   />
 );
-
-const staticData = [
-  {
-    id: "Temperature",
-    color: "hsl(84, 70%, 50%)",
-    data: [
-      {
-        x: "00",
-        y: 278,
-      },
-      {
-        x: "01",
-        y: 80,
-      },
-      {
-        x: "03",
-        y: 285,
-      },
-      {
-        x: "04",
-        y: 259,
-      },
-      {
-        x: "05",
-        y: 210,
-      },
-      {
-        x: "06",
-        y: 23,
-      },
-      {
-        x: "07",
-        y: 27,
-      },
-      {
-        x: "08",
-        y: 271,
-      },
-      {
-        x: "09",
-        y: 298,
-      },
-      {
-        x: "10",
-        y: 233,
-      },
-      {
-        x: "11",
-        y: 267,
-      },
-      {
-        x: "12",
-        y: 90,
-      },
-      {
-        x: "13",
-        y: 23,
-      },
-      {
-        x: "14",
-        y: 27,
-      },
-      {
-        x: "15",
-        y: 271,
-      },
-      {
-        x: "16",
-        y: 298,
-      },
-      {
-        x: "17",
-        y: 233,
-      },
-      {
-        x: "18",
-        y: 267,
-      },
-      {
-        x: "19",
-        y: 90,
-      },
-      {
-        x: "20",
-        y: 23,
-      },
-      {
-        x: "21",
-        y: 27,
-      },
-      {
-        x: "22",
-        y: 271,
-      },
-      {
-        x: "23",
-        y: 298,
-      },
-    ],
-  },
-];
 
 export default App;
 

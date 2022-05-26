@@ -9,8 +9,9 @@ const typeDefs = gql`
     name: String
   }
   type Sensor {
-    id: ID! @id
+    id: Int
     truck: [Truck!]! @relationship(type: "TRACKED_BY", direction: OUT)
+    temperature: [Temperature!]! @relationship(type: "TRACKED_BY", direction: IN)
   }
   type Temperature {
     id: ID! @id
