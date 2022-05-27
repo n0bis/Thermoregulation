@@ -157,15 +157,18 @@ const AlertList = () => {
       <h4>Incomming alerts</h4>
       {alerts.length !== 0 ? (
         <ul>
-          {alerts.map((item) => {
-            const response = item.msg.split(" ");
-            const color = response[1];
-            if (response[0] !== "undefined") {
+         {alerts.map((item) => {
+            const jsonResponse = JSON.parse(item.msg);
+            
+            if (jsonResponse.LEDblink !== "undefined") {
+              const color = jsonResponse.LEDblink;
+              const sensor = jsonResponse.sensor;
+
               if (color === "blue") {
                 return (
                   <li className={`alert-info blue`}>
                     <p>
-                      It is too cold - {item.currentDate.getHours()}{" "}
+                      Sensor {sensor} is too cold - {item.currentDate.getHours()}{" "}
                       {item.currentDate.getMinutes()}
                     </p>
                   </li>
@@ -174,7 +177,7 @@ const AlertList = () => {
                 return (
                   <li className={`alert-info red`}>
                     <p>
-                      It is too hot {item.currentDate.getHours()}{" "}
+                      Sensor {sensor} is too hot {item.currentDate.getHours()}{" "}
                       {item.currentDate.getMinutes()}
                     </p>
                   </li>
