@@ -36,28 +36,28 @@ while True:
 					
 		if event["id"] == 1:
 			if 15 < event["value"]:
-				client.publish("rules/alert", json.dumps({"sensor": 1, "LEDblink": "red"}))
+				client.publish("rules/alert", json.dumps({"sensor": 1, "LEDblink": "red"}), 2)
 				print("Sensor 1 Too hot! - publish to mqtt")
 			continue
 		if event["id"] == 2:
 			if 15 < event["value"]:
-				client.publish("rules/alert", json.dumps({"sensor": 2, "LEDblink": "red"}))
+				client.publish("rules/alert", json.dumps({"sensor": 2, "LEDblink": "red"}), 2)
 				print("Sensor 2 Too hot! - publish to mqtt")
 			if 5 > event["value"]:
-				client.publish("rules/alert", json.dumps({"sensor": 2, "LEDblink": "blue"}))
+				client.publish("rules/alert", json.dumps({"sensor": 2, "LEDblink": "blue"}), 2)
 				print("Sensor 2 Too cold! - publish to mqtt")
 			continue
 		if event["id"] == 3:
 			if 15 < event["value"]:
-				client.publish("rules/alert", json.dumps({"sensor": 3, "LEDblink": "red"}))
+				client.publish("rules/alert", json.dumps({"sensor": 3, "LEDblink": "red"}), 2)
 				print("Sensor 3 Too hot! - publish to mqtt")
 			if 10 > event["value"]:
-				client.publish("rules/alert", json.dumps({"sensor": 3, "LEDblink": "red"}))
+				client.publish("rules/alert", json.dumps({"sensor": 3, "LEDblink": "red"}), 2)
 				print("Sensor 3 Too cold! - publish to mqtt")
 			continue
 
 		print("No rule broken move along - publish to mqtt")
-		client.publish("rules/alert", "{}")
+		client.publish("rules/alert", "{}", 2)
 	except Exception as err:
 		print(err)
 		continue

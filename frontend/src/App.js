@@ -130,16 +130,14 @@ const AlertList = () => {
 
       client.on("message", function (topic, message) {
         // message is Buffer
-        var alertsArray = alerts;
+        let alertsArray = alerts;
         const currentDate = new Date();
-        const timestamp = currentDate.getTime();
         const msg = new TextDecoder().decode(message);
         console.log(msg);
         alertsArray.push({
           msg,
           currentDate,
         });
-        console.log(alertsArray);
 
         alertsArray.reverse();
         setAlerts(alertsArray);
@@ -158,11 +156,11 @@ const AlertList = () => {
     <div className="alert-box">
       <h4>Incomming alerts</h4>
 
-      {/*alerts.length !== 0 ? (
+      {alerts.length !== 0 ? (
         <ul>
-         {alerts.map((item) => {
+         {alerts.map(item => {
             const jsonResponse = JSON.parse(item.msg);
-            
+            console.log(item);
             if (jsonResponse.LEDblink !== "undefined") {
               const color = jsonResponse.LEDblink;
               const sensor = jsonResponse.sensor;
@@ -174,7 +172,6 @@ const AlertList = () => {
                       Sensor {sensor} is too cold - {addZero(item.currentDate.getHours())}{":"}
                       {addZero(item.currentDate.getMinutes())}{":"}
                       {addZero(item.currentDate.getSeconds())}
-                      
                     </p>
                   </li>
                 );
@@ -194,7 +191,7 @@ const AlertList = () => {
         </ul>
       ) : (
         <div className="alert-info">No alerts found.</div>
-      )*/}
+      )}
     </div>
   );
 };
