@@ -121,7 +121,7 @@ const AlertList = () => {
       });
 
       client.on("connect", function () {
-        client.subscribe("rules/alert", function (err) {
+        client.subscribe("rules/alert", {qos: 2}, function (err) {
           if (!err) {
             console.log("subscribed!");
           }
