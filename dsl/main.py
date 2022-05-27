@@ -24,8 +24,8 @@ consumer.subscribe(['temperature'])
 
 with driver.session() as session:
 	session.run(("CREATE (rule:Rule {nameSpace: 'red apples', "
-		"conditions: temperature >= 21 || temperature <= 0,"
-		"actions: LEDblink red})"
+		"conditions: 'temperature >= 21 || temperature <= 0',"
+		"actions: 'LEDblink red'})"
 	))
 
 while True:
@@ -45,10 +45,10 @@ while True:
 		temperature = mean([sensor['temperature']['value'] for sensor in sensors]) 
 
 		if (temperature >= 21):
-			client.publish("rules/temperature/alert", "LEDblink: red")
+			client.publish("rules/alert", "LEDblink: red")
 		else:
 			print("No temperature rule broken move along - publish to mqtt")
-			client.publish("rules/temperature/alert", "")
+			client.publish("rules/alert", "")
 	except Exception as err:
 		print(err)
 		continue

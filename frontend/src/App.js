@@ -10,6 +10,7 @@ const client = mqtt.connect(URL);
 
 function App() {
   const [data, setData] = useState([]);
+  const [isLoading, setLoading] = useState(true);
 
   useEffect(() => {
     getData();
@@ -20,8 +21,9 @@ function App() {
   }, []);
 
   function getData() {
+    setLoading(true);
     fetch("http://localhost:4000", {
-      body: '{"query":"query ExampleQuery {temperatures {value tracked_at} trucks {name}}"}',
+      body: '{"query":"query ExampleQuery {sensors {id,temperature { value, tracked_at}}}"}',
       headers: {
         "Content-Type": "application/json",
       },
@@ -29,17 +31,39 @@ function App() {
     })
       .then((response) => response.json())
       .then((response) => {
-        console.log(response.data.temperatures);
+        console.log(response.data);
         const { data } = response;
         const { temperatures } = data;
+        //const mean = list => list.reduce((prev, curr) => prev + curr) / list.length;
 
-        setData([
-          {
-            id: "Temperature",
-            color: "hsl(84, 70%, 50%)",
-            data: dataConverter(temperatures),
-          },
-        ]);
+        const fixedData = [];
+        const arrays = []
+        data.sensors.forEach((item) => {
+          arrays.push(item.temperature)
+        });
+        console.log(arrays)
+        const result = [];
+
+
+        for(var i = 0; i < arrays[0].length; i++){
+          var num = 0;
+          var time = 0;
+
+          for(var i2 = 0; i2 < arrays.length; i2++){ 
+            num += arrays[i2][i].value;
+            time = arrays[i2][i].tracked_at;
+          }
+          var mean = Math.round(num / arrays.length)
+          result.push({"value": mean, "tracked_at": time});
+        }
+        fixedData.push({
+          id: `All sensors`,
+          data: dataConverter(result),
+        });
+        console.log(fixedData);
+
+        setData(fixedData);
+        setLoading(false);
 
         console.log(temperatures);
       });
@@ -54,7 +78,7 @@ function App() {
       <div className="sidebar">
         <ul>
           <li className="active">
-            <a href="#">Dashbsoard</a>
+            <a href="#">Dashboard</a>
           </li>
           <li>
             <a href="#">Rules manager</a>
@@ -72,7 +96,9 @@ function App() {
           <div className="container">
             <div className="chart">
               <div className="red-line" />
-              {data.length !== 0 && <MyResponsiveLine data={data} />}
+              {!isLoading && data.length !== 0 && (
+                <MyResponsiveLine data={data} />
+              )}
               <div className="blue-line" />
             </div>
             <AlertList />
@@ -88,6 +114,8 @@ function dataConverter(data) {
   console.log(data);
 
   data.forEach((element) => {
+    var date = new Date(element.tracked_at);
+    console.log(date.toDateString());
     convertedData.push({
       x: element.tracked_at,
       y: element.value,
@@ -132,7 +160,7 @@ const AlertList = () => {
         console.log(msg);
         alertsArray.push({
           msg,
-          timestamp,
+          currentDate,
         });
         setAlerts(alertsArray);
       });
@@ -154,17 +182,17 @@ const AlertList = () => {
                 return (
                   <li className={`alert-info blue`}>
                     <p>
-                      It is too cold - {item.timestamp.getHours()}{" "}
-                      {item.timestamp.getMinutes()}
+                      It is too cold - {item.currentDate.getHours()}{" "}
+                      {item.currentDate.getMinutes()}
                     </p>
                   </li>
                 );
               } else if (color === "red") {
                 return (
-                  <li className={`alert-info blue`}>
+                  <li className={`alert-info red`}>
                     <p>
-                      It is too hot {item.timestamp.getHours()}{" "}
-                      {item.timestamp.getMinutes()}
+                      It is too hot {item.currentDate.getHours()}{" "}
+                      {item.currentDate.getMinutes()}
                     </p>
                   </li>
                 );
@@ -188,7 +216,7 @@ const MyResponsiveLine = ({ data /* see data tab */ }) => (
       type: "linear",
       min: "-40",
       max: "40",
-      stacked: true,
+      stacked: false,
       reverse: false,
     }}
     minValue={-40}
@@ -203,6 +231,7 @@ const MyResponsiveLine = ({ data /* see data tab */ }) => (
       tickPadding: 5,
       tickRotation: 0,
       legend: "Time",
+      tickValues: 3,
       legendOffset: 36,
       legendPosition: "middle",
     }}
@@ -250,107 +279,6 @@ const MyResponsiveLine = ({ data /* see data tab */ }) => (
     ]}
   />
 );
-
-const staticData = [
-  {
-    id: "Temperature",
-    color: "hsl(84, 70%, 50%)",
-    data: [
-      {
-        x: "00",
-        y: 278,
-      },
-      {
-        x: "01",
-        y: 80,
-      },
-      {
-        x: "03",
-        y: 285,
-      },
-      {
-        x: "04",
-        y: 259,
-      },
-      {
-        x: "05",
-        y: 210,
-      },
-      {
-        x: "06",
-        y: 23,
-      },
-      {
-        x: "07",
-        y: 27,
-      },
-      {
-        x: "08",
-        y: 271,
-      },
-      {
-        x: "09",
-        y: 298,
-      },
-      {
-        x: "10",
-        y: 233,
-      },
-      {
-        x: "11",
-        y: 267,
-      },
-      {
-        x: "12",
-        y: 90,
-      },
-      {
-        x: "13",
-        y: 23,
-      },
-      {
-        x: "14",
-        y: 27,
-      },
-      {
-        x: "15",
-        y: 271,
-      },
-      {
-        x: "16",
-        y: 298,
-      },
-      {
-        x: "17",
-        y: 233,
-      },
-      {
-        x: "18",
-        y: 267,
-      },
-      {
-        x: "19",
-        y: 90,
-      },
-      {
-        x: "20",
-        y: 23,
-      },
-      {
-        x: "21",
-        y: 27,
-      },
-      {
-        x: "22",
-        y: 271,
-      },
-      {
-        x: "23",
-        y: 298,
-      },
-    ],
-  },
-];
 
 export default App;
 

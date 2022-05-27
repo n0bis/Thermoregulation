@@ -1,1 +1,1 @@
- {"value": 0, "timestamp": 1652347395}
+{"truckID": 1, "sensors": [{"id": 1, "temperature": {"value": 25}, "humidity": {"level": 50.0}}, {"id": 2, "temperature": {"value": 25}, "humidity": {"level": 50.0}}, {"id": 3, "temperature": {"value": 25}, "humidity": {"level": 50.0}}, {"id": 4, "temperature": {"value": 25}, "humidity": {"level": 50.0}}], "timestamp": 1653134308}

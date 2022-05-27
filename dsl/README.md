@@ -13,16 +13,22 @@ maxTemperature <int> action LEDblink <red> | <green> | <blue>
 end
 ```
 
-var temperature = mean(sensor1, sensor2, sensor3, sensor4)
+```
+temperature = mean(sensor1, sensor2, sensor3, sensor4)
+```
 
-Rule temperature "red apples"
+```
+Rule "red apples"
 temperature >= 21 || temperature <= 0 action LEDblink red
 end
-
-Rule humidity "blue apples"
+```
+```
+Rule "blue apples"
 humidity >= 60 || humidity <= 40 action LEDblink blue
 end
-
-Rule temperature "green apples"
+```
+```
+Rule "green apples"
 temperature == 21 && humidity == 80 action LEDblink red
 end
+```

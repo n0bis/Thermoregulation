@@ -88,14 +88,14 @@ body {
   position: absolute;
   width: calc(100% - 40px);
   height: 2px;
-  bottom:250px;
+  bottom:230px;
   background-color: blue;
 }
 .red-line {
   position: absolute;
   width: calc(100% - 40px);
   height: 2px;
-  top:154px;
+  top:148px;
   background-color: #f44336;
 }
 
