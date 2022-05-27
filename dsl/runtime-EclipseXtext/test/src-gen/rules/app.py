@@ -38,6 +38,9 @@ while True:
 			if 15 < event["value"]:
 				client.publish("rules/alert", json.dumps({"sensor": 1, "LEDblink": "red"}), 2)
 				print("Sensor 1 Too hot! - publish to mqtt")
+			if 10 > event["value"]:
+				client.publish("rules/alert", json.dumps({"sensor": 1, "LEDblink": "blue"}), 2)
+				print("Sensor 1 Too cold! - publish to mqtt")
 			continue
 		if event["id"] == 2:
 			if 15 < event["value"]:
@@ -51,9 +54,11 @@ while True:
 			if 15 < event["value"]:
 				client.publish("rules/alert", json.dumps({"sensor": 3, "LEDblink": "red"}), 2)
 				print("Sensor 3 Too hot! - publish to mqtt")
-			if 10 > event["value"]:
-				client.publish("rules/alert", json.dumps({"sensor": 3, "LEDblink": "red"}), 2)
-				print("Sensor 3 Too cold! - publish to mqtt")
+			continue
+		if event["id"] == 4:
+			if 15 < event["value"]:
+				client.publish("rules/alert", json.dumps({"sensor": 4, "LEDblink": "red"}), 2)
+				print("Sensor 4 Too hot! - publish to mqtt")
 			continue
 
 		print("No rule broken move along - publish to mqtt")

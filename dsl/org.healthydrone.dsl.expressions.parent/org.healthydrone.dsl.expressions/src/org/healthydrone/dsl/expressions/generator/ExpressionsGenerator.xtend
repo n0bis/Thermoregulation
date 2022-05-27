@@ -75,14 +75,14 @@ class ExpressionsGenerator extends AbstractGenerator {
 				«IF rule.name == "minTemperature"»
 				if «rule.value» > event["value"]:
 					«FOR action : rule.actions»
-					client.publish("rules/alert", json.dumps({"sensor": «sensor», "«action.name»": "«action.value.toString()»"}))
+					client.publish("rules/alert", json.dumps({"sensor": «sensor», "«action.name»": "«action.value.toString()»"}), 2)
 					«ENDFOR»
 					print("Sensor «sensor» Too cold! - publish to mqtt")
 				«ENDIF»		
 				«IF rule.name == "maxTemperature"»
 				if «rule.value» < event["value"]:
 					«FOR action : rule.actions»
-					client.publish("rules/alert", json.dumps({"sensor": «sensor», "«action.name»": "«action.value.toString()»"}))
+					client.publish("rules/alert", json.dumps({"sensor": «sensor», "«action.name»": "«action.value.toString()»"}), 2)
 					«ENDFOR»
 					print("Sensor «sensor» Too hot! - publish to mqtt")
 				«ENDIF»			
@@ -92,7 +92,7 @@ class ExpressionsGenerator extends AbstractGenerator {
 			«ENDFOR»
 
 			print("No rule broken move along - publish to mqtt")
-			client.publish("rules/alert", "")
+			client.publish("rules/alert", "{}", 2)
 		except Exception as err:
 			print(err)
 			continue
