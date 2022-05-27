@@ -78,11 +78,9 @@ function App() {
         <div className="content">
           <div className="container">
             <div className="chart">
-              <div className="red-line" />
               {!isLoading && data.length !== 0 && (
                 <MyResponsiveLine data={data} />
               )}
-              <div className="blue-line" />
             </div>
             <AlertList />
           </div>
@@ -116,10 +114,6 @@ const AlertList = () => {
     //setAlerts([{ message: "LEDblink: blue", timestamp: "shiusasa" }]);
   }, []);
 
-  useEffect(() => {
-    console.log(alerts);
-  }, [alerts]);
-
   function getAlerts() {
     try {
       client.on("connect", () => {
@@ -145,6 +139,9 @@ const AlertList = () => {
           msg,
           currentDate,
         });
+        console.log(alertsArray);
+
+        alertsArray.reverse();
         setAlerts(alertsArray);
       });
     } catch (e) {
@@ -152,10 +149,16 @@ const AlertList = () => {
     }
   }
 
+  function addZero(i) {
+    if (i < 10) {i = "0" + i}
+    return i;
+  }
+
   return (
     <div className="alert-box">
       <h4>Incomming alerts</h4>
-      {alerts.length !== 0 ? (
+
+      {/*alerts.length !== 0 ? (
         <ul>
          {alerts.map((item) => {
             const jsonResponse = JSON.parse(item.msg);
@@ -168,8 +171,10 @@ const AlertList = () => {
                 return (
                   <li className={`alert-info blue`}>
                     <p>
-                      Sensor {sensor} is too cold - {item.currentDate.getHours()}{" "}
-                      {item.currentDate.getMinutes()}
+                      Sensor {sensor} is too cold - {addZero(item.currentDate.getHours())}{":"}
+                      {addZero(item.currentDate.getMinutes())}{":"}
+                      {addZero(item.currentDate.getSeconds())}
+                      
                     </p>
                   </li>
                 );
@@ -177,8 +182,9 @@ const AlertList = () => {
                 return (
                   <li className={`alert-info red`}>
                     <p>
-                      Sensor {sensor} is too hot {item.currentDate.getHours()}{" "}
-                      {item.currentDate.getMinutes()}
+                      Sensor {sensor} is too hot - {addZero(item.currentDate.getHours())}{":"}
+                      {addZero(item.currentDate.getMinutes())}{":"}
+                      {addZero(item.currentDate.getSeconds())}
                     </p>
                   </li>
                 );
@@ -188,7 +194,7 @@ const AlertList = () => {
         </ul>
       ) : (
         <div className="alert-info">No alerts found.</div>
-      )}
+      )*/}
     </div>
   );
 };
@@ -206,7 +212,7 @@ const MyResponsiveLine = ({ data /* see data tab */ }) => (
       reverse: false,
     }}
     minValue={-40}
-    maxValue={30}
+    maxValue={40}
     yFormat=" >-.2f"
     curve="cardinal"
     axisTop={null}

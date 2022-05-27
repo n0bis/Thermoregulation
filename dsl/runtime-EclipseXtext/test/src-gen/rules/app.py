@@ -57,7 +57,7 @@ while True:
 			continue
 
 		print("No rule broken move along - publish to mqtt")
-		client.publish("rules/alert", "")
+		client.publish("rules/alert", "{}")
 	except Exception as err:
 		print(err)
 		continue
