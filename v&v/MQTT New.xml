@@ -815,47 +815,60 @@ ServersideSubscriber = MQTTsubscriber();
 Sub = MQTTsub();
 Unsub = MQTTunsub();
 Con = MQTTConnect();
+<<<<<<< Updated upstream
 CientSidePublisher = ProbModelPub();
+=======
+ClientSidePublisher = ProbModelPub();
+>>>>>>> Stashed changes
 ClientSideSubscriber = ProbModelSub();
 
 db = Database();
 Worker = WorkerController();
 Gateway = GatewayController();
 // List one or more processes to be composed into a system.
+<<<<<<< Updated upstream
 system ServersidePublisher, ServersideSubscriber, Sub, Unsub, Con, CientSidePublisher, ClientSideSubscriber, Worker, Gateway, db;
+=======
+system ServersidePublisher, ServersideSubscriber, Sub, Unsub, Con, ClientSidePublisher, ClientSideSubscriber, Worker, Gateway, db;
+>>>>>>> Stashed changes
     </system>
 	<queries>
 		<query>
+			<formula>E&lt;&gt; ClientSidePublisher.publish</formula>
+			<comment>FR1
+That the publisher client can reach a state of publishing</comment>
+		</query>
+		<query>
+			<formula>E&lt;&gt; PropSub.subscribed</formula>
+			<comment>FR2</comment>
+		</query>
+		<query>
+			<formula>E&lt;&gt; ClientSideSubscriber.reset</formula>
+			<comment>FR3
+That the subscriber client can reach a state of reset in case of hanging. Needs clocks</comment>
+		</query>
+		<query>
+			<formula>ClientSidePublisher.PingReq --&gt; ServersidePublisher.start</formula>
+			<comment>FR4
+That the server can send a ping request to the client publisher and the client then performs the pingreqest action</comment>
+		</query>
+		<query>
+			<formula>E&lt;&gt; ClientSidePublisher.PingReq imply ServersideSubscriber.PingReq</formula>
+			<comment>FR4
+That the server can send a ping request to the client subscriber and the client then performs the pingreqest action</comment>
+		</query>
+		<query>
 			<formula>A[] not deadlock</formula>
+			<comment>NFR2
+That the system does not deadlock</comment>
+		</query>
+		<query>
+			<formula>E&lt;&gt; ServersidePublisher.B9</formula>
 			<comment></comment>
 		</query>
 		<query>
-			<formula>E&lt;&gt; PropSub.reset</formula>
-			<comment></comment>
-		</query>
-		<query>
-			<formula>E&lt;&gt; PropPup.publish</formula>
-			<comment></comment>
-		</query>
-		<query>
-			<formula>E&lt;&gt; MQTTpublish.PingReq imply PropPup.PingReq</formula>
-			<comment></comment>
-		</query>
-		<query>
-			<formula>E&lt;&gt; MQTTsubscribe.PingReq imply PropSub.PingReq</formula>
-			<comment></comment>
-		</query>
-		<query>
-			<formula>[] (PropPup.PingReq -&gt; &lt;&gt; PropPup.PingResp)</formula>
-			<comment></comment>
-		</query>
-		<query>
-			<formula>E&lt;&gt;(PropSub.PUB_ACK and x1 &lt; 0.1)</formula>
-			<comment></comment>
-		</query>
-		<query>
-			<formula>E&lt;&gt; MQTTpublish.B9</formula>
-			<comment></comment>
+			<formula>A&lt;&gt; ClientSidePublisher.PingReq imply ServersidePublisher.start</formula>
+			<comment>When the publisher sends a pingrequest</comment>
 		</query>
 	</queries>
 </nta>
