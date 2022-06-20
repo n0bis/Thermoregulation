@@ -815,22 +815,14 @@ ServersideSubscriber = MQTTsubscriber();
 Sub = MQTTsub();
 Unsub = MQTTunsub();
 Con = MQTTConnect();
-<<<<<<< Updated upstream
-CientSidePublisher = ProbModelPub();
-=======
 ClientSidePublisher = ProbModelPub();
->>>>>>> Stashed changes
 ClientSideSubscriber = ProbModelSub();
 
 db = Database();
 Worker = WorkerController();
 Gateway = GatewayController();
 // List one or more processes to be composed into a system.
-<<<<<<< Updated upstream
-system ServersidePublisher, ServersideSubscriber, Sub, Unsub, Con, CientSidePublisher, ClientSideSubscriber, Worker, Gateway, db;
-=======
 system ServersidePublisher, ServersideSubscriber, Sub, Unsub, Con, ClientSidePublisher, ClientSideSubscriber, Worker, Gateway, db;
->>>>>>> Stashed changes
     </system>
 	<queries>
 		<query>
@@ -864,7 +856,7 @@ That the system does not deadlock</comment>
 		</query>
 		<query>
 			<formula>E&lt;&gt; ServersidePublisher.B9</formula>
-			<comment></comment>
+			<comment>That it can send messages from the publisher</comment>
 		</query>
 		<query>
 			<formula>A&lt;&gt; ClientSidePublisher.PingReq imply ServersidePublisher.start</formula>
