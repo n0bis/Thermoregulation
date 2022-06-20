@@ -1,0 +1,31 @@
+grammar dk.sdu.mmmi.mdsd.Math with org.eclipse.xtext.common.Terminals
+
+generate math "http://www.sdu.dk/mmmi/mdsd/Math"
+
+MathExp:
+	'var' name=ID '=' exp=Exp
+;
+
+Exp: // Illegal due to left recursion
+	left=Number (operator=ExpOp right=Exp)?
+;
+
+ExpOp:
+	{Plus} '+' | {Minus} '-'	 | {Mult} '*' | {Div} '/'	
+;
+
+Primary:
+	Number | Parenthesis | VariableUse
+;
+
+Parenthesis:
+	'(' exp=Exp ')'
+;
+
+Number:
+	value=INT
+;
+
+VariableUse:
+	ref = [MathExp]
+;

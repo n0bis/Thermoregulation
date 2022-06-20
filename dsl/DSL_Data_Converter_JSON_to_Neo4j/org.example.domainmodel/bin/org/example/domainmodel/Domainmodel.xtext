@@ -1,0 +1,36 @@
+grammar org.example.domainmodel.Domainmodel with org.eclipse.xtext.common.Terminals
+
+generate domainmodel "http://www.example.org/domainmodel/Domainmodel"
+
+Domainmodel:
+	(elements+=AbstractElement)*;
+
+AbstractElement: PackageDeclaration | Type | Import;
+
+PackageDeclaration:
+	'package' name=QualifiedName '{' (elements+=AbstractElement)* '}'
+;
+
+Import:
+	'import' importedNamespace=QualifiedNameWithWildcard
+;
+
+QualifiedNameWithWildcard:
+	QualifiedName '.*'?
+;
+
+QualifiedName:
+	ID ('.' ID)*
+;
+
+Type:
+	DataType | Entity;
+
+DataType:
+	'datatype' name=ID;
+
+Entity:
+	'entity' name=ID ('extends' superType=[Entity|QualifiedName])? "{"(features+=Feature)* "}";
+	
+Feature:
+	(many?='many')? name=ID ':' type=[Type|QualifiedName];

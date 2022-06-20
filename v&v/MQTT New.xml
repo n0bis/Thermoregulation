@@ -51,7 +51,7 @@ int row = 0;</declaration>
 			<target ref="id0"/>
 			<label kind="synchronisation" x="-75" y="-46">PUBONE?</label>
 			<label kind="assignment" x="-75" y="-29">row++</label>
-			<nail x="-93" y="-59"/>
+			<nail x="-85" y="-51"/>
 		</transition>
 		<transition>
 			<source ref="id0"/>
@@ -810,19 +810,19 @@ AwaitingPing=1</label>
 		</transition>
 	</template>
 	<system>// Place template instantiations here.
-MQTTpublish = MQTTpublisher();
-MQTTsubscribe = MQTTsubscriber();
+ServersidePublisher = MQTTpublisher();
+ServersideSubscriber = MQTTsubscriber();
 Sub = MQTTsub();
 Unsub = MQTTunsub();
 Con = MQTTConnect();
-PropPup = ProbModelPub();
-PropSub = ProbModelSub();
+CientSidePublisher = ProbModelPub();
+ClientSideSubscriber = ProbModelSub();
 
 db = Database();
 Worker = WorkerController();
 Gateway = GatewayController();
 // List one or more processes to be composed into a system.
-system MQTTpublish, MQTTsubscribe, Sub, Unsub, Con, PropPup, PropSub, Worker, Gateway, db;
+system ServersidePublisher, ServersideSubscriber, Sub, Unsub, Con, CientSidePublisher, ClientSideSubscriber, Worker, Gateway, db;
     </system>
 	<queries>
 		<query>
