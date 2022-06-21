@@ -779,39 +779,51 @@ AwaitingPing=1</label>
 		</transition>
 	</template>
 	<system>// Place template instantiations here.
-MQTTpublish = MQTTpublisher();
-MQTTsubscribe = MQTTsubscriber();
+ServerSidePublisher = MQTTpublisher();
+ServerSideSubscriber = MQTTsubscriber();
 Sub = MQTTsub();
 Unsub = MQTTunsub();
 Con = MQTTConnect();
-PropPup = ProbModelPub();
-PropSub = ProbModelSub();
+ClientSidePublisher = ProbModelPub();
+ClientSideSubscriber = ProbModelSub();
 
 db = Database();
 Worker = WorkerController();
 Gateway = GatewayController();
 // List one or more processes to be composed into a system.
-system MQTTpublish, MQTTsubscribe, Sub, Unsub, Con, PropPup, PropSub, Worker, Gateway, db;
+system ServerSidePublisher, ServerSideSubscriber, Sub, Unsub, Con, ClientSidePublisher, ClientSideSubscriber, Worker, Gateway, db;
     </system>
 	<queries>
+		<query>
+			<formula>E&lt;&gt; ClientSidePublisher.publish</formula>
+			<comment>FR1
+That the publisher client can reach a state of publishing</comment>
+		</query>
+		<query>
+			<formula>E&lt;&gt; ClientSideSubscriber.subscribed</formula>
+			<comment>FR2</comment>
+		</query>
+		<query>
+			<formula>E&lt;&gt; ClientSideSubscriber.reset</formula>
+			<comment>FR3
+That the subscriber client can reach a state of reset in case of hanging. Needs clocks</comment>
+		</query>
+		<query>
+			<formula>ClientSidePublisher.PingReq --&gt; ServerSidePublisher.start</formula>
+			<comment>FR4
+That the server can send a ping request to the client publisher and the client then performs the pingreqest action</comment>
+		</query>
+		<query>
+			<formula>E&lt;&gt; ClientSidePublisher.PingReq imply ServersideSubscriber.PingReq</formula>
+			<comment>FR4
+That the server can send a ping request to the client subscriber and the client then performs the pingreqest action</comment>
+		</query>
 		<query>
 			<formula>A[] not deadlock</formula>
 			<comment>NFR2</comment>
 		</query>
 		<query>
-			<formula>E&lt;&gt; PropSub.reset</formula>
-			<comment>FR3</comment>
-		</query>
-		<query>
-			<formula>E&lt;&gt; PropPup.publish</formula>
-			<comment>FR1</comment>
-		</query>
-		<query>
-			<formula>PropPup.PingReq --&gt; MQTTpublish.start</formula>
-			<comment>FR6</comment>
-		</query>
-		<query>
-			<formula>A[] (PropPup.PingReq imply A&lt;&gt; MQTTpublish.start)</formula>
+			<formula>A[] (ServerSidePublisher.PingReq imply A&lt;&gt; ClientSidePublisher.start)</formula>
 			<comment></comment>
 		</query>
 		<query>
@@ -819,16 +831,12 @@ system MQTTpublish, MQTTsubscribe, Sub, Unsub, Con, PropPup, PropSub, Worker, Ga
 			<comment>FR6</comment>
 		</query>
 		<query>
-			<formula>E&lt;&gt; MQTTpublish.B9</formula>
-			<comment></comment>
+			<formula>E&lt;&gt; ServerSidePublisher.B11</formula>
+			<comment>If it reaches the last state for QOS lvl 2</comment>
 		</query>
 		<query>
-			<formula>A&lt;&gt; MQTTsubscribe.end_recieve</formula>
+			<formula>A&lt;&gt; ServerSideSubscriber.end_recieve</formula>
 			<comment></comment>
-		</query>
-		<query>
-			<formula>E&lt;&gt; PropSub.subscribed</formula>
-			<comment>FR2</comment>
 		</query>
 	</queries>
 </nta>
